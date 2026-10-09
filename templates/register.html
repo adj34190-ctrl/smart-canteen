@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account | Forkline</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family: sans-serif; }
+body { background: #0c1015; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+.card { background: #141b22; border: 1px solid #253141; border-radius: 12px; padding: 28px; width: 100%; max-width: 380px; }
+input, select { width: 100%; background: #0c1015; border: 1px solid #2b394b; border-radius: 6px; color: #fff; padding: 10px; margin: 6px 0 12px; }
+.btn { width: 100%; background: #a4f424; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; color: #000; }
+</style>
+</head>
+<body>
+<div class="card">
+<h2 style="margin-bottom:14px;">Create Account</h2>
+{% if error %}<p style="color:#ff7b72; font-size:13px; margin-bottom:10px;">{{ error }}</p>{% endif %}
+<form method="POST">
+<label style="font-size:12px; color:#8b9bb0;">FULL NAME</label>
+<input type="text" name="fullname" required>
+<label style="font-size:12px; color:#8b9bb0;">EMAIL</label>
+<input type="email" name="email" required>
+<label style="font-size:12px; color:#8b9bb0;">ROLE</label>
+<select name="role"><option value="student">Student</option><option value="staff">Kitchen staff</option></select>
+<label style="font-size:12px; color:#8b9bb0;">PASSWORD</label>
+<input type="password" name="password" minlength="8" required>
+<label style="font-size:12px; color:#8b9bb0;">CONFIRM PASSWORD</label>
+<input type="password" name="confirm_password" minlength="8" required>
+<button type="submit" class="btn">Register &rarr;</button>
+</form>
+<p style="text-align:center; font-size:13px; margin-top:14px;"><a href="/" style="color:#a4f424; text-decoration:none;">Already have account? Sign In</a></p>
+</div>
+</body>
+</html>
