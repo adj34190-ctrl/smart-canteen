@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token {{ order[0] }}</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family: sans-serif; }
+body { background: #0c1015; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+.card { background: #141b22; border: 1px solid #253141; border-radius: 12px; padding: 28px; width: 100%; max-width: 380px; text-align: center; }
+.token { font-size: 42px; font-weight: 900; color: #a4f424; margin: 10px 0; }
+.box { background: #0c1015; border-radius: 6px; padding: 14px; text-align: left; font-size: 13px; margin: 16px 0; }
+.row { display: flex; justify-content: space-between; margin-bottom: 6px; color: #8b9bb0; }
+</style>
+</head>
+<body>
+<div class="card">
+<span style="font-size:11px; background:#253141; padding:3px 8px; border-radius:12px; color:#8b9bb0;">CANTEEN COUNTER PICKUP</span>
+<div class="token">{{ order[0] }}</div>
+<span style="background:#1f3621; color:#56d364; font-size:12px; font-weight:bold; padding:4px 10px; border-radius:12px;">Status: {{ order[4] }}</span>
+<div class="box">
+<div class="row"><span>Student:</span><span style="color:#fff;">{{ order[1] }}</span></div>
+<div class="row"><span>Time:</span><span style="color:#fff;">{{ order[5] }}</span></div>
+<div class="row"><span>Items:</span><span style="color:#fff;">{{ order[2] }}</span></div>
+<div class="row"><span>Total:</span><span style="color:#a4f424; font-weight:bold;">₹{{ "%.2f"|format(order[3]) }}</span></div>
+</div>
+<a href="/menu" style="display:block; background:#253141; color:#fff; text-decoration:none; padding:12px; border-radius:6px; font-weight:bold; font-size:13px;">Back to Menu</a>
+</div>
+</body>
+</html>
