@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In | Forkline</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family: sans-serif; }
+body { background: #0c1015; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+.card { background: #141b22; border: 1px solid #253141; border-radius: 12px; padding: 28px; width: 100%; max-width: 380px; }
+.brand { color: #a4f424; font-weight: 800; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+input, select { width: 100%; background: #0c1015; border: 1px solid #2b394b; border-radius: 6px; color: #fff; padding: 10px; margin: 6px 0 14px; }
+.btn { width: 100%; background: #a4f424; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; color: #000; }
+.demo { background: #0c1015; border: 1px dashed #2b394b; border-radius: 6px; padding: 10px; font-size: 12px; margin-top: 16px; color: #8b9bb0; }
+</style>
+</head>
+<body>
+<div class="card">
+<div class="brand">forkline campus canteen</div>
+<h2 style="margin-bottom:4px;">Sign In</h2>
+<p style="font-size:13px; color:#8b9bb0; margin-bottom:18px;">Good food. Zero queue.</p>
+{% if error %}<p style="color:#ff7b72; font-size:13px; margin-bottom:10px;">{{ error }}</p>{% endif %}
+<form method="POST">
+<label style="font-size:12px; color:#8b9bb0;">EMAIL</label>
+<input type="email" name="email" value="student@college.edu" required>
+<label style="font-size:12px; color:#8b9bb0;">PASSWORD</label>
+<input type="password" name="password" value="pass123" required>
+<label style="font-size:12px; color:#8b9bb0;">ROLE</label>
+<select name="role"><option value="student">Student</option><option value="staff">Kitchen staff</option></select>
+<button type="submit" class="btn">Sign In &rarr;</button>
+</form>
+<div class="demo">
+<strong>Demo Logins:</strong><br>
+Student: student@college.edu / pass123<br>
+Staff: staff@college.edu / staff123
+</div>
+<p style="text-align:center; font-size:13px; margin-top:14px;"><a href="/register" style="color:#a4f424; text-decoration:none;">Create Account</a></p>
+</div>
+</body>
+</html>
