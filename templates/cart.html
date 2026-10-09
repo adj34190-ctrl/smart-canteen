@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Order | Forkline</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family: sans-serif; }
+body { background: #0c1015; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+.card { background: #141b22; border: 1px solid #253141; border-radius: 12px; padding: 24px; width: 100%; max-width: 400px; }
+.item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #253141; font-size: 14px; }
+.btn { width: 100%; background: #a4f424; border: none; padding: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; color: #000; margin-top: 20px; font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Your Order</h2>
+<p style="font-size:13px; color:#8b9bb0; margin-bottom:14px;">Review your meal before ordering.</p>
+<div class="item"><span>1x Veg Cheese Sandwich</span><span style="color:#a4f424; font-weight:bold;">₹45.00</span></div>
+<div class="item"><span>1x Cold Coffee</span><span style="color:#a4f424; font-weight:bold;">₹30.00</span></div>
+<div style="display:flex; justify-content:space-between; margin-top:16px; font-size:16px; font-weight:bold;">
+<span>Total</span><span style="color:#a4f424;">₹75.00</span>
+</div>
+<form method="POST">
+<input type="hidden" name="order_items" value="1x Veg Cheese Sandwich, 1x Cold Coffee">
+<input type="hidden" name="total_amount" value="75.00">
+<button type="submit" class="btn">Place Order &rarr;</button>
+</form>
+<p style="text-align:center; margin-top:14px;"><a href="/menu" style="color:#8b9bb0; text-decoration:none; font-size:13px;">&larr; Back to menu</a></p>
+</div>
+</body>
+</html>
