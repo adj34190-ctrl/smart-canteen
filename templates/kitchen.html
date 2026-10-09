@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchen Control</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family: sans-serif; }
+body { background: #0c1015; color: #fff; padding: 20px; }
+header { display: flex; justify-content: space-between; border-bottom: 1px solid #253141; padding-bottom: 14px; margin-bottom: 20px; }
+.grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+@media(max-width:700px){ .grid { grid-template-columns: 1fr; } }
+.card { background: #141b22; border: 1px solid #253141; border-radius: 10px; padding: 18px; }
+.order { background: #0c1015; border: 1px solid #253141; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.btn { background: #238636; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+<body>
+<header>
+<div><strong style="color:#a4f424;">forkline CAMPUS CANTEEN</strong><div style="font-size:12px; color:#8b9bb0;">KITCHEN CONTROL</div></div>
+<div style="font-size:13px;">{{ staff_name }} | <a href="/logout" style="color:#ff7b72; text-decoration:none;">Logout</a></div>
+</header>
+<div class="grid">
+<div class="card">
+<h3 style="margin-bottom:12px;">Active Orders Queue</h3>
+{% for o in orders %}
+<div class="order">
+<div style="display:flex; justify-content:space-between;">
+<span style="color:#a4f424; font-weight:bold; font-size:18px;">{{ o[1] }}</span>
+<span style="font-size:12px; color:#8b9bb0;">{{ o[6] }}</span>
+</div>
+<div style="font-size:14px; margin:4px 0;">{{ o[3] }} ({{ o[2] }})</div>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+<span style="font-size:12px; color:#8b9bb0;">Status: <strong>{{ o[5] }}</strong></span>
+<form method="POST" action="/api/order/status" style="margin:0;">
+<input type="hidden" name="order_id" value="{{ o[0] }}">
+{% if o[5] == 'Received' %}
+<input type="hidden" name="status" value="Ready">
+<button type="submit" class="btn">Mark Ready</button>
+{% elif o[5] == 'Ready' %}
+<input type="hidden" name="status" value="Completed">
+<button type="submit" class="btn" style="background:#1f6feb;">Mark Delivered</button>
+{% else %}
+<span style="color:#56d364; font-size:12px; font-weight:bold;">&check; Done</span>
+{% endif %}
+</form>
+</div>
+</div>
+{% endfor %}
+</div>
+<div class="card">
+<h3 style="margin-bottom:12px;">Menu Stock Toggle</h3>
+{% for item in menu_items %}
+<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #253141; font-size:13px;">
+<span>{{ item[1] }}</span>
+<form method="POST" action="/api/menu/stock" style="margin:0;">
+<input type="hidden" name="item_id" value="{{ item[0] }}">
+<button type="submit" style="padding:4px 8px; border:none; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; background:{% if item[3] %}#1f3621; color:#56d364{% else %}#3b1b1f; color:#ff7b72{% endif %};">
+{% if item[3] %}IN STOCK{% else %}OUT OF STOCK{% endif %}
+</button>
+</form>
+</div>
+{% endfor %}
+</div>
+</div>
+</body>
+</html>
