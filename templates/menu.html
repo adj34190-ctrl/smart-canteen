@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu | Forkline</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family: sans-serif; }
+body { background: #0c1015; color: #fff; padding-bottom: 80px; }
+header { background: #141b22; padding: 16px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #253141; }
+.card { background: #141b22; border: 1px solid #253141; border-radius: 10px; padding: 16px; margin: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+.btn-add { background: #a4f424; color: #000; text-decoration: none; font-weight: bold; padding: 8px 16px; border-radius: 6px; }
+.bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #141b22; border-top: 1px solid #253141; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+<header>
+<span style="color:#a4f424; font-weight:bold;">forkline CAMPUS CANTEEN</span>
+<span style="font-size:13px;">{{ username }} | <a href="/logout" style="color:#ff7b72; text-decoration:none;">Logout</a></span>
+</header>
+<div style="padding:20px 20px 0;">
+<h2>Today's Menu</h2>
+<p style="font-size:13px; color:#8b9bb0;">Fresh items from campus kitchen</p>
+</div>
+{% for item in items %}
+<div class="card" {% if not item[4] %}style="opacity:0.4;"{% endif %}>
+<div>
+<span style="font-size:11px; background:#253141; padding:2px 6px; border-radius:4px; color:#8b9bb0;">{{ item[2] }}</span>
+<div style="font-weight:bold; font-size:16px; margin:4px 0;">{{ item[1] }}</div>
+<div style="color:#a4f424; font-weight:bold;">₹{{ "%.2f"|format(item[3]) }}</div>
+</div>
+<div>
+{% if item[4] %}
+<a href="/cart" class="btn-add">+ Add</a>
+{% else %}
+<span style="color:#ff7b72; font-size:12px; font-weight:bold;">Out of Stock</span>
+{% endif %}
+</div>
+</div>
+{% endfor %}
+<div class="bottom-bar">
+<span style="font-size:14px;">Items in cart</span>
+<a href="/cart" class="btn-add">View Cart &rarr;</a>
+</div>
+</body>
+</html>
