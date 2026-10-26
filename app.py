@@ -1,180 +1,207 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from config import Config
 
 app = Flask(__name__)
-app.secret_key = "smart_canteen_super_secret_key"
-DB_NAME = "canteen.db"
+app.config.from_object(Config)
 
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        fullname TEXT,
-        email TEXT UNIQUE,
-        password TEXT,
-        role TEXT
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS menu (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        category TEXT,
-        price REAL,
-        in_stock INTEGER DEFAULT 1
-    )''')
-    c.execute('''CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        token_id TEXT,
-        student_name TEXT,
-        items TEXT,
-        total_amount REAL,
-        status TEXT,
-        timestamp TEXT
-    )''')
-    c.execute("INSERT OR IGNORE INTO users (id, fullname, email, password, role) VALUES (1, 'Student Adarsh', 'student@college.edu', 'pass123', 'student')")
-    c.execute("INSERT OR IGNORE INTO users (id, fullname, email, password, role) VALUES (2, 'Canteen Master', 'staff@college.edu', 'staff123', 'staff')")
-    c.execute("SELECT count(*) FROM menu")
-    if c.fetchone()[0] == 0:
-        default_items = [
-            ('Samosa Pav', 'Snacks', 20.00, 1),
-            ('Veg Cheese Sandwich', 'Snacks', 45.00, 1),
-            ('Masala Dosa', 'Meals', 50.00, 1),
-            ('Cold Coffee', 'Beverages', 30.00, 1),
-            ('Hot Chai', 'Beverages', 15.00, 1)
-        ]
-        c.executemany("INSERT INTO menu (name, category, price, in_stock) VALUES (?, ?, ?, ?)", default_items)
-    conn.commit()
-    conn.close()
+try:
+    db = SQLAlchemy(app)
+except Exception:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///canteen.db'
+    db = SQLAlchemy(app)
 
-init_db()
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    fullname = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), default='student')
+    wallet_balance = db.Column(db.Float, default=500.00)
+
+class MenuItem(db.Model):
+    __tablename__ = 'menu_items'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    is_veg = db.Column(db.Boolean, default=True)
+    in_stock = db.Column(db.Boolean, default=True)
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    token_id = db.Column(db.String(20), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    student_name = db.Column(db.String(100), nullable=False)
+    items_summary = db.Column(db.Text, nullable=False)
+    total_amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(30), default='Received')
+    special_notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+with app.app_context():
+    try:
+        db.create_all()
+        if not User.query.filter_by(email='student@college.edu').first():
+            db.session.add(User(fullname='Student Adarsh', email='student@college.edu', password='pass123', role='student', wallet_balance=750.0))
+            db.session.add(User(fullname='Canteen Master', email='staff@college.edu', password='staff123', role='staff', wallet_balance=0.0))
+            db.session.commit()
+
+        if MenuItem.query.count() == 0:
+            demo_menu = [
+                MenuItem(name='Samosa Pav (2 Pcs)', category='Snacks', price=25.0, is_veg=True, in_stock=True),
+                MenuItem(name='Grilled Veg Cheese Sandwich', category='Snacks', price=55.0, is_veg=True, in_stock=True),
+                MenuItem(name='Special Masala Dosa', category='Meals', price=65.0, is_veg=True, in_stock=True),
+                MenuItem(name='Chole Bhature Thali', category='Meals', price=90.0, is_veg=True, in_stock=True),
+                MenuItem(name='Cold Coffee with Chocolate', category='Beverages', price=40.0, is_veg=True, in_stock=True),
+                MenuItem(name='Fresh Ginger Chai', category='Beverages', price=15.0, is_veg=True, in_stock=True)
+            ]
+            db.session.bulk_save_objects(demo_menu)
+            db.session.commit()
+    except Exception as e:
+        print(f"DB Error: {e}")
 
 @app.route("/", methods=["GET", "POST"])
-def login():
+def auth():
     if request.method == "POST":
+        action = request.form.get("action")
         email = request.form.get("email")
         password = request.form.get("password")
-        role = request.form.get("role")
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
-        c.execute("SELECT fullname, role FROM users WHERE email=? AND password=? AND role=?", (email, password, role))
-        user = c.fetchone()
-        conn.close()
-        if user:
-            session["username"] = user[0]
-            session["email"] = email
-            session["role"] = user[1]
-            return redirect(url_for("kitchen" if user[1] == "staff" else "menu"))
-        return render_template("login.html", error="Invalid credentials or role.")
-    return render_template("login.html")
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        fullname = request.form.get("fullname")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm_password")
-        role = request.form.get("role", "student")
-        if password != confirm_password:
-            return render_template("register.html", error="Passwords do not match!")
-        try:
-            conn = sqlite3.connect(DB_NAME)
-            c = conn.cursor()
-            c.execute("INSERT INTO users (fullname, email, password, role) VALUES (?, ?, ?, ?)", (fullname, email, password, role))
-            conn.commit()
-            conn.close()
-            return redirect(url_for("login"))
-        except sqlite3.IntegrityError:
-            return render_template("register.html", error="Email already registered.")
-    return render_template("register.html")
+        if action == "login":
+            role = request.form.get("role")
+            user = User.query.filter_by(email=email, password=password, role=role).first()
+            if user:
+                session["user_id"] = user.id
+                session["username"] = user.fullname
+                session["role"] = user.role
+                if user.role == "staff":
+                    return redirect(url_for("staff_dashboard"))
+                return redirect(url_for("student_dashboard"))
+            flash("Invalid credentials or role selected.", "error")
 
-@app.route("/menu")
-def menu():
+        elif action == "register":
+            fullname = request.form.get("fullname")
+            role = request.form.get("role", "student")
+            existing = User.query.filter_by(email=email).first()
+            if existing:
+                flash("College email already registered.", "error")
+            else:
+                new_u = User(fullname=fullname, email=email, password=password, role=role, wallet_balance=500.0)
+                db.session.add(new_u)
+                db.session.commit()
+                flash("Registration complete! You can now log in.", "success")
+
+    return render_template("auth.html")
+
+@app.route("/dashboard")
+def student_dashboard():
     if session.get("role") != "student":
-        return redirect(url_for("login"))
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("SELECT id, name, category, price, in_stock FROM menu")
-    items = c.fetchall()
-    conn.close()
-    return render_template("menu.html", items=items, username=session.get("username", "Student"))
+        return redirect(url_for("auth"))
+    
+    user = User.query.get(session["user_id"])
+    menu_items = MenuItem.query.all()
+    user_orders = Order.query.filter_by(user_id=user.id).order_by(Order.id.desc()).all()
+    active_order = Order.query.filter(
+        Order.user_id == user.id, 
+        Order.status.in_(['Received', 'Preparing', 'Ready'])
+    ).order_by(Order.id.desc()).first()
 
-@app.route("/cart", methods=["GET", "POST"])
-def cart():
+    return render_template("student_dashboard.html", user=user, menu=menu_items, orders=user_orders, active_order=active_order)
+
+@app.route("/api/order/place", methods=["POST"])
+def place_order():
     if session.get("role") != "student":
-        return redirect(url_for("login"))
-    if request.method == "POST":
-        order_details = request.form.get("order_items", "1x Veg Cheese Sandwich, 1x Cold Coffee")
-        total_amount = float(request.form.get("total_amount", 75.00))
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
-        c.execute("SELECT count(*) FROM orders")
-        order_count = c.fetchone()[0] + 101
-        token_id = f"T-{order_count}"
-        now = datetime.now().strftime("%I:%M %p")
-        c.execute("INSERT INTO orders (token_id, student_name, items, total_amount, status, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
-                  (token_id, session.get("username"), order_details, total_amount, "Received", now))
-        conn.commit()
-        conn.close()
-        return redirect(url_for("token", token_id=token_id))
-    return render_template("cart.html")
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
 
-@app.route("/token/<token_id>")
-def token(token_id):
-    if "role" not in session:
-        return redirect(url_for("login"))
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("SELECT token_id, student_name, items, total_amount, status, timestamp FROM orders WHERE token_id=?", (token_id,))
-    order = c.fetchone()
-    conn.close()
-    if not order:
-        return redirect(url_for("menu"))
-    return render_template("token.html", order=order)
+    user = User.query.get(session["user_id"])
+    data = request.json or {}
+    items = data.get("items", [])
+    total_amount = float(data.get("total", 0.0))
+    notes = data.get("notes", "")
 
-@app.route("/kitchen")
-def kitchen():
+    if not items or total_amount <= 0:
+        return jsonify({"success": False, "message": "Cart cannot be empty!"})
+
+    if user.wallet_balance < total_amount:
+        return jsonify({"success": False, "message": "Insufficient Campus Wallet Balance. Please recharge!"})
+
+    user.wallet_balance -= total_amount
+    total_orders = Order.query.count() + 101
+    token_id = f"T-{total_orders}"
+
+    items_summary = ", ".join([f"{item['qty']}x {item['name']}" for item in items])
+    new_order = Order(
+        token_id=token_id,
+        user_id=user.id,
+        student_name=user.fullname,
+        items_summary=items_summary,
+        total_amount=total_amount,
+        special_notes=notes,
+        status="Received"
+    )
+    db.session.add(new_order)
+    db.session.commit()
+
+    return jsonify({"success": True, "token_id": token_id, "new_balance": user.wallet_balance})
+
+@app.route("/api/wallet/add-funds", methods=["POST"])
+def add_funds():
+    if "user_id" not in session:
+        return redirect(url_for("auth"))
+    amount = float(request.form.get("amount", 200.0))
+    user = User.query.get(session["user_id"])
+    user.wallet_balance += amount
+    db.session.commit()
+    return redirect(url_for("student_dashboard"))
+
+@app.route("/staff-console")
+def staff_dashboard():
     if session.get("role") != "staff":
-        return redirect(url_for("login"))
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("SELECT id, token_id, student_name, items, total_amount, status, timestamp FROM orders ORDER BY id DESC")
-    orders = c.fetchall()
-    c.execute("SELECT id, name, price, in_stock FROM menu")
-    menu_items = c.fetchall()
-    conn.close()
-    return render_template("kitchen.html", orders=orders, menu_items=menu_items, staff_name=session.get("username"))
+        return redirect(url_for("auth"))
 
-@app.route("/api/order/status", methods=["POST"])
-def update_order_status():
+    orders = Order.query.order_by(Order.id.desc()).all()
+    menu_items = MenuItem.query.all()
+    total_revenue = sum([o.total_amount for o in orders])
+    completed_count = len([o for o in orders if o.status == 'Completed'])
+
+    return render_template("staff_dashboard.html", 
+                           orders=orders, 
+                           menu_items=menu_items, 
+                           revenue=total_revenue, 
+                           completed=completed_count,
+                           staff_name=session.get("username", "Canteen Master"))
+
+@app.route("/api/staff/update-order", methods=["POST"])
+def staff_update_order():
     if session.get("role") != "staff":
         return jsonify({"error": "Unauthorized"}), 403
     order_id = request.form.get("order_id")
     new_status = request.form.get("status")
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("UPDATE orders SET status=? WHERE id=?", (new_status, order_id))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("kitchen"))
+    order = Order.query.get(order_id)
+    if order:
+        order.status = new_status
+        db.session.commit()
+    return redirect(url_for("staff_dashboard"))
 
-@app.route("/api/menu/stock", methods=["POST"])
-def toggle_menu_stock():
+@app.route("/api/staff/toggle-item", methods=["POST"])
+def staff_toggle_item():
     if session.get("role") != "staff":
         return jsonify({"error": "Unauthorized"}), 403
     item_id = request.form.get("item_id")
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute("UPDATE menu SET in_stock = 1 - in_stock WHERE id=?", (item_id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for("kitchen"))
+    item = MenuItem.query.get(item_id)
+    if item:
+        item.in_stock = not item.in_stock
+        db.session.commit()
+    return redirect(url_for("staff_dashboard"))
 
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login"))
+    return redirect(url_for("auth"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
