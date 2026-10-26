@@ -6,7 +6,6 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Proper single instance of SQLAlchemy
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -39,7 +38,7 @@ class Order(db.Model):
     special_notes = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-with app.app_context():
+def setup_database():
     try:
         db.create_all()
         if not User.query.filter_by(email='student@college.edu').first():
@@ -59,7 +58,10 @@ with app.app_context():
             db.session.bulk_save_objects(demo_menu)
             db.session.commit()
     except Exception as e:
-        print(f"DB Init note: {e}")
+        print(f"Database bootstrap warning: {e}")
+
+with app.app_context():
+    setup_database()
 
 @app.route("/", methods=["GET", "POST"])
 def auth():
@@ -202,3 +204,4 @@ def logout():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+    
