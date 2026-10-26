@@ -6,11 +6,8 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
-try:
-    db = SQLAlchemy(app)
-except Exception:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///canteen.db'
-    db = SQLAlchemy(app)
+# Proper single instance of SQLAlchemy
+db = SQLAlchemy(app)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -62,7 +59,7 @@ with app.app_context():
             db.session.bulk_save_objects(demo_menu)
             db.session.commit()
     except Exception as e:
-        print(f"DB Error: {e}")
+        print(f"DB Init note: {e}")
 
 @app.route("/", methods=["GET", "POST"])
 def auth():
