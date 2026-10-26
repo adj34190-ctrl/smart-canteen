@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Console | Forkline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #090d12; --card: #111720; --border: #1f2b3b; --primary: #9bf00b; --text: #f0f4f8; --muted: #8899ac; }
+        * { box-sizing: border-box; margin:0; padding:0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 24px; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+        @media(max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+        .box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .ticket { background: #090d12; border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+        .btn-status { background: #238636; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div style="color:var(--primary); font-weight:800; font-size:16px;">FORKLINE CAMPUS CANTEEN</div>
+            <div style="font-size:12px; color:var(--muted);">KITCHEN DISPLAY SYSTEM &bull; SHIFT OPS</div>
+        </div>
+        <div style="font-size:13px;">{{ staff_name }} (Kitchen Staff) | <a href="/logout" style="color:#ff7b72; text-decoration:none; margin-left:8px; font-weight:bold;">Exit</a></div>
+    </header>
+
+    <div style="display:flex; gap:16px; margin-bottom:24px;">
+        <div class="box" style="flex:1;">
+            <div style="font-size:12px; color:var(--muted); font-weight:700;">TOTAL SHIFT REVENUE</div>
+            <div style="font-size:24px; font-weight:800; color:var(--primary); margin-top:4px;">&#8377;{{ "%.2f"|format(revenue) }}</div>
+        </div>
+        <div class="box" style="flex:1;">
+            <div style="font-size:12px; color:var(--muted); font-weight:700;">FULFILLED TOKENS</div>
+            <div style="font-size:24px; font-weight:800; color:#56d364; margin-top:4px;">{{ completed }} / {{ orders|length }}</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Live Queue -->
+        <div class="box">
+            <h3 style="margin-bottom:14px;">Live Ticket Queue</h3>
+            {% for o in orders %}
+            <div class="ticket">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--primary); font-size:20px; font-weight:900;">{{ o.token_id }}</span>
+                    <span style="font-size:12px; color:var(--muted);">{{ o.student_name }}</span>
+                </div>
+                <div style="font-size:14px; margin:6px 0;">{{ o.items_summary }}</div>
+                {% if o.special_notes %}<div style="font-size:12px; color:#e3b341; margin-bottom:6px;">Note: {{ o.special_notes }}</div>{% endif %}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                    <span style="font-size:12px; color:var(--muted);">Status: <strong>{{ o.status }}</strong></span>
+                    <form method="POST" action="/api/staff/update-order" style="display:inline;">
+                        <input type="hidden" name="order_id" value="{{ o.id }}">
+                        {% if o.status == 'Received' %}
+                        <input type="hidden" name="status" value="Preparing">
+                        <button type="submit" class="btn-status" style="background:#d29922;">Mark Preparing</button>
+                        {% elif o.status == 'Preparing' %}
+                        <input type="hidden" name="status" value="Ready">
+                        <button type="submit" class="btn-status">Mark Ready</button>
+                        {% elif o.status == 'Ready' %}
+                        <input type="hidden" name="status" value="Completed">
+                        <button type="submit" class="btn-status" style="background:#1f6feb;">Mark Delivered</button>
+                        {% else %}
+                        <span style="color:#56d364; font-size:12px; font-weight:bold;">&check; Closed</span>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p style="color:var(--muted);">No pending orders in queue.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Inventory Toggler -->
+        <div class="box">
+            <h3 style="margin-bottom:14px;">Counter Stock Control</h3>
+            {% for item in menu_items %}
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px;">
+                <div>
+                    <div><strong>{{ item.name }}</strong></div>
+                    <div style="color:var(--muted); font-size:11px;">&#8377;{{ "%.2f"|format(item.price) }}</div>
+                </div>
+                <form method="POST" action="/api/staff/toggle-item" style="margin:0;">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit" style="padding:4px 8px; border:none; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; background:{% if item.in_stock %}#143521; color:#56d364;{% else %}#3b1419; color:#ff7b72;{% endif %}">
+                        {% if item.in_stock %}IN STOCK{% else %}OUT OF STOCK{% endif %}
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
