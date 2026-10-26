@@ -6,14 +6,14 @@ class Config:
     database_url = os.environ.get('DATABASE_URL')
     
     if database_url:
+        # Render postgres:// ya postgresql:// ko pg8000 driver format me convert karta hai
         if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql://", 1)
+            database_url = database_url.replace("postgres://", "postgresql+pg8000://", 1)
+        elif database_url.startswith("postgresql://"):
+            database_url = database_url.replace("postgresql://", "postgresql+pg8000://", 1)
         SQLALCHEMY_DATABASE_URI = database_url
     else:
-        db_user = os.environ.get('MYSQL_USER', 'root')
-        db_password = os.environ.get('MYSQL_PASSWORD', '')
-        db_host = os.environ.get('MYSQL_HOST', 'localhost')
-        db_name = os.environ.get('MYSQL_DB', 'smart_canteen_db')
-        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:3306/{db_name}"
+        # Fallback to local SQLite if no cloud DB provided
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///canteen.db'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
