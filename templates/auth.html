@@ -3,113 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication | Forkline Campus Canteen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Smart Canteen | Campus Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #090d12; color: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .auth-container { background: #111720; border: 1px solid #1f2b3b; border-radius: 16px; padding: 36px; width: 100%; max-width: 440px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .brand { color: #9bf00b; font-weight: 800; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
-        .toggle-box { display: flex; background: #090d12; border-radius: 8px; padding: 4px; margin: 20px 0; border: 1px solid #1f2b3b; }
-        .toggle-btn { flex: 1; padding: 10px; background: none; border: none; color: #8899ac; font-weight: 700; font-size: 13px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .toggle-btn.active { background: #1a2332; color: #9bf00b; }
-        .field { margin-bottom: 14px; text-align: left; }
-        label { display: block; font-size: 11px; font-weight: 700; color: #8899ac; margin-bottom: 6px; text-transform: uppercase; }
-        input, select { width: 100%; background: #090d12; border: 1px solid #1f2b3b; border-radius: 8px; color: #fff; padding: 12px; font-size: 14px; outline: none; }
-        input:focus, select:focus { border-color: #9bf00b; }
-        .btn-submit { width: 100%; background: #9bf00b; border: none; border-radius: 8px; padding: 14px; font-weight: 800; color: #000; cursor: pointer; font-size: 15px; margin-top: 12px; }
-        .demo-bar { margin-top: 24px; padding: 12px; background: #090d12; border: 1px dashed #1f2b3b; border-radius: 8px; font-size: 12px; color: #8899ac; line-height: 1.5; }
-        .demo-bar code { color: #9bf00b; }
-        .alert { background: #3b1419; color: #ff7b72; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; border: 1px solid #63232a; }
-        .alert.success { background: #143521; color: #56d364; border-color: #238636; }
+        :root {
+            --bg-canvas: #f1f5f9;
+            --surface: #ffffff;
+            --primary: #1e40af;
+            --primary-accent: #2563eb;
+            --primary-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow-card: 0 10px 25px -5px rgba(30, 64, 175, 0.08), 0 8px 10px -6px rgba(30, 64, 175, 0.04);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background-color: var(--bg-canvas);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: var(--surface);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 36px 32px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--primary);
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .brand-text {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        h1 { font-size: 26px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+        p.subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+        /* Switch Tabs */
+        .toggle-box {
+            display: flex;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .toggle-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 600;
+            outline: none;
+            transition: 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary-accent);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .btn-submit:hover {
+            background: var(--primary-accent);
+        }
+
+        .demo-credentials {
+            margin-top: 24px;
+            padding: 14px 16px;
+            background: var(--primary-light);
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--primary);
+            line-height: 1.6;
+        }
+
+        .flash-msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #fee2e2;
+            color: var(--danger);
+        }
     </style>
 </head>
 <body>
+
     <div class="auth-container">
-        <div class="brand">&#9889; FORKLINE CAMPUS CANTEEN</div>
-        <h2 id="formTitle">Sign In</h2>
-        <p style="color:#8899ac; font-size:13px; margin-top:4px;">Enterprise Cafeteria Ordering Portal</p>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, msg in messages %}
-                <div class="alert {% if category == 'success' %}success{% endif %}">{{ msg }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div class="toggle-box">
-            <button class="toggle-btn active" onclick="switchForm('login')">Sign In</button>
-            <button class="toggle-btn" onclick="switchForm('register')">Create Account</button>
+        
+        <div class="brand-header">
+            <div class="brand-icon">&#9889;</div>
+            <div class="brand-text">Forkline Campus Canteen</div>
         </div>
 
-        <!-- Login Form -->
-        <form id="loginForm" method="POST">
-            <input type="hidden" name="action" value="login">
-            <div class="field">
+        <h1 id="formHeading">Sign In</h1>
+        <p class="subtitle" id="formSubtitle">Enterprise Cafeteria Ordering Portal</p>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash-msg">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Tab Switcher -->
+        <div class="toggle-box">
+            <button class="toggle-btn active" type="button" onclick="switchTo('login')">Sign In</button>
+            <button class="toggle-btn" type="button" onclick="switchTo('register')">Create Account</button>
+        </div>
+
+        <form method="POST" action="/">
+            <input type="hidden" name="action" id="actionField" value="login">
+
+            <div class="input-group" id="fullnameGroup" style="display:none;">
+                <label>Full Name</label>
+                <input type="text" name="fullname" placeholder="Student Adarsh">
+            </div>
+
+            <div class="input-group">
                 <label>College Email</label>
                 <input type="email" name="email" value="student@college.edu" required>
             </div>
-            <div class="field">
+
+            <div class="input-group">
                 <label>Password</label>
                 <input type="password" name="password" value="pass123" required>
             </div>
-            <div class="field">
+
+            <div class="input-group">
                 <label>Access Role</label>
                 <select name="role">
                     <option value="student">Student Portal</option>
                     <option value="staff">Canteen Staff / Kitchen</option>
                 </select>
             </div>
-            <button type="submit" class="btn-submit">Enter Campus Portal &rarr;</button>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Enter Campus Portal &rarr;</button>
         </form>
 
-        <!-- Register Form -->
-        <form id="registerForm" method="POST" style="display:none;">
-            <input type="hidden" name="action" value="register">
-            <div class="field">
-                <label>Full Name</label>
-                <input type="text" name="fullname" placeholder="Adarsh Sharma" required>
-            </div>
-            <div class="field">
-                <label>College Email</label>
-                <input type="email" name="email" placeholder="you@college.edu" required>
-            </div>
-            <div class="field">
-                <label>Select Role</label>
-                <select name="role">
-                    <option value="student">Student</option>
-                    <option value="staff">Kitchen Operator</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Set Password</label>
-                <input type="password" name="password" minlength="6" required>
-            </div>
-            <button type="submit" class="btn-submit" style="background:#56d364;">Create Profile &rarr;</button>
-        </form>
-
-        <div class="demo-bar">
+        <div class="demo-credentials">
             <strong>Ready Demo Access:</strong><br>
-            Student: <code>student@college.edu</code> / <code>pass123</code><br>
-            Kitchen Staff: <code>staff@college.edu</code> / <code>staff123</code>
+            Student: <code>student@college.edu / pass123</code><br>
+            Kitchen Staff: <code>staff@college.edu / staff123</code>
         </div>
     </div>
 
     <script>
-        function switchForm(type) {
+        function switchTo(type) {
             const btns = document.querySelectorAll('.toggle-btn');
-            btns.forEach(b => b.classList.remove('active'));
-            if(type === 'login') {
+            const action = document.getElementById('actionField');
+            const fullname = document.getElementById('fullnameGroup');
+            const heading = document.getElementById('formHeading');
+            const subtitle = document.getElementById('formSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (type === 'login') {
                 btns[0].classList.add('active');
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('formTitle').innerText = 'Sign In';
+                btns[1].classList.remove('active');
+                action.value = 'login';
+                fullname.style.display = 'none';
+                heading.innerText = 'Sign In';
+                subtitle.innerText = 'Enterprise Cafeteria Ordering Portal';
+                submitBtn.innerHTML = 'Enter Campus Portal &rarr;';
             } else {
                 btns[1].classList.add('active');
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('registerForm').style.display = 'block';
-                document.getElementById('formTitle').innerText = 'Create Account';
+                btns[0].classList.remove('active');
+                action.value = 'register';
+                fullname.style.display = 'block';
+                heading.innerText = 'Register Account';
+                subtitle.innerText = 'Create your student dining credentials';
+                submitBtn.innerHTML = 'Create Account &rarr;';
             }
         }
     </script>
