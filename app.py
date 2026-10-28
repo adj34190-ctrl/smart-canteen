@@ -41,22 +41,43 @@ class Order(db.Model):
 def setup_database():
     try:
         db.create_all()
+
+        # Seed initial demo users
         if not User.query.filter_by(email='student@college.edu').first():
             db.session.add(User(fullname='Student Adarsh', email='student@college.edu', password='pass123', role='student', wallet_balance=750.0))
             db.session.add(User(fullname='Canteen Master', email='staff@college.edu', password='staff123', role='staff', wallet_balance=0.0))
             db.session.commit()
 
-        if MenuItem.query.count() == 0:
-            demo_menu = [
-                MenuItem(name='Samosa Pav (2 Pcs)', category='Snacks', price=25.0, is_veg=True, in_stock=True),
-                MenuItem(name='Grilled Veg Cheese Sandwich', category='Snacks', price=55.0, is_veg=True, in_stock=True),
-                MenuItem(name='Special Masala Dosa', category='Meals', price=65.0, is_veg=True, in_stock=True),
-                MenuItem(name='Chole Bhature Thali', category='Meals', price=90.0, is_veg=True, in_stock=True),
-                MenuItem(name='Cold Coffee with Chocolate', category='Beverages', price=40.0, is_veg=True, in_stock=True),
-                MenuItem(name='Fresh Ginger Chai', category='Beverages', price=15.0, is_veg=True, in_stock=True)
-            ]
-            db.session.bulk_save_objects(demo_menu)
-            db.session.commit()
+        # Complete Updated Menu Items List
+        master_menu = [
+            # Original Essentials
+            {'name': 'Samosa Pav (2 Pcs)', 'category': 'Snacks', 'price': 25.0, 'is_veg': True},
+            {'name': 'Mumbai Special Vada Pav', 'category': 'Snacks', 'price': 20.0, 'is_veg': True},
+            {'name': 'Crispy Butter Masala Dosa', 'category': 'South Indian', 'price': 65.0, 'is_veg': True},
+            {'name': 'Creamy White Sauce Pasta', 'category': 'Continental', 'price': 80.0, 'is_veg': True},
+            {'name': 'Veg Steamed Momos (6 Pcs)', 'category': 'Street Food', 'price': 50.0, 'is_veg': True},
+            {'name': 'Chicken Steamed Momos (6 Pcs)', 'category': 'Street Food', 'price': 70.0, 'is_veg': False},
+            {'name': 'Veg Cheese Schezwan Frankie', 'category': 'Rolls & Frankie', 'price': 55.0, 'is_veg': True},
+            {'name': 'Crispy Chicken Frankie', 'category': 'Rolls & Frankie', 'price': 75.0, 'is_veg': False},
+            {'name': 'Grilled Veg Cheese Sandwich', 'category': 'Snacks', 'price': 55.0, 'is_veg': True},
+            {'name': 'Chole Bhature Thali', 'category': 'Meals', 'price': 90.0, 'is_veg': True},
+            {'name': 'Cold Coffee with Chocolate', 'category': 'Beverages', 'price': 40.0, 'is_veg': True},
+            {'name': 'Fresh Ginger Masala Chai', 'category': 'Beverages', 'price': 15.0, 'is_veg': True}
+        ]
+
+        # Sync items without wiping existing orders
+        for item_data in master_menu:
+            existing = MenuItem.query.filter_by(name=item_data['name']).first()
+            if not existing:
+                new_item = MenuItem(
+                    name=item_data['name'],
+                    category=item_data['category'],
+                    price=item_data['price'],
+                    is_veg=item_data['is_veg'],
+                    in_stock=True
+                )
+                db.session.add(new_item)
+        db.session.commit()
     except Exception as e:
         print(f"Database bootstrap warning: {e}")
 
@@ -204,4 +225,3 @@ def logout():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-    
