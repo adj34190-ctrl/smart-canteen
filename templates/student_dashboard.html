@@ -3,140 +3,483 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Console | Smart Canteen</title>
+    <title>Smart Canteen | Student Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ---------------- MODERN LIGHT BLUE & WHITE COLOR PALETTE ---------------- */
         :root {
-            --bg-base: #090d12;
-            --bg-surface: #111720;
-            --bg-card: #182230;
-            --primary: #9bf00b;
-            --text-main: #f0f4f8;
-            --text-muted: #8899ac;
-            --border: #1f2b3b;
-            --success: #38d39f;
-            --danger: #ff5c5c;
+            --bg-main: #f1f5f9;         /* Soft Cool Gray/Ice Blue Canvas */
+            --surface: #ffffff;         /* Pure Clean White */
+            --surface-elevated: #f8fafc;/* Soft Slate Card Background */
+            --primary: #1e40af;         /* Deep Executive Blue */
+            --primary-accent: #2563eb;  /* Vibrant Royal Blue */
+            --primary-light: #dbeafe;   /* Light Sky Tint */
+            --text-title: #0f172a;      /* Deep Midnight Navy */
+            --text-body: #334155;       /* Slate Dark Gray */
+            --text-muted: #64748b;      /* Muted Steel Gray */
+            --border: #e2e8f0;          /* Crisp Border Line */
+            --success: #059669;         /* Mint Green */
+            --success-light: #d1fae5;   /* Light Mint Background */
+            --warning: #d97706;         /* Amber */
+            --warning-light: #fef3c7;   /* Amber Light */
+            --danger: #dc2626;          /* Red */
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(37, 99, 235, 0.08);
         }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg-base); color: var(--text-main); display: flex; min-height: 100vh; }
 
-        /* Left Navigation Rail */
-        aside { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border); display:flex; flex-direction:column; padding: 24px 16px; position: fixed; height: 100vh; z-index: 10; }
-        .logo { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; color: var(--primary); text-transform: uppercase; margin-bottom: 30px; }
-        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-        .nav-item { padding: 12px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; display:flex; align-items:center; gap: 10px; transition: 0.2s; }
-        .nav-item:hover, .nav-item.active { background: var(--bg-card); color: var(--primary); }
-        .user-footer { background: var(--bg-card); padding: 12px; border-radius: 10px; border: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-main); color: var(--text-body); display: flex; min-height: 100vh; }
 
-        /* Content Canvas */
-        main { margin-left: 260px; flex: 1; padding: 36px 40px; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; animation: fadeIn 0.25s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        /* Left Navigation Sidebar */
+        aside {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+        }
 
-        /* Stat Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--bg-surface); border: 1px solid var(--border); padding: 22px; border-radius: 14px; }
-        .stat-val { font-size: 26px; font-weight: 800; margin-top: 6px; }
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .brand-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
 
-        /* Food Catalog */
-        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .food-item { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; position: relative; }
-        .food-item.out-stock { opacity: 0.45; }
-        .btn-add { background: var(--bg-card); color: var(--primary); border: 1px solid var(--primary); padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; float: right; font-size: 13px; }
-        .btn-add:hover { background: var(--primary); color: #000; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .nav-link {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover { background: var(--surface-elevated); color: var(--primary-accent); }
+        .nav-link.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+        }
+        .nav-pill {
+            margin-left: auto;
+            background: #fee2e2;
+            color: var(--danger);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 800;
+        }
+        .nav-link.active .nav-pill { background: #ffffff; color: var(--primary); }
 
-        /* Interactive Cart */
-        .cart-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px; max-width: 520px; }
-        .cart-line { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-        .btn-confirm { width: 100%; background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 20px; }
+        .profile-card {
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        /* Progress Stepper */
-        .stepper { display: flex; justify-content: space-between; margin: 30px 0; }
-        .step { text-align: center; flex: 1; }
-        .circle { width: 34px; height: 34px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: 700; font-size: 13px; }
-        .step.done .circle { background: var(--primary); color: #000; border-color: var(--primary); }
+        /* Main Workspace Container */
+        main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 32px 48px;
+            max-width: 1300px;
+        }
+
+        .tab-section { display: none; }
+        .tab-section.active { display: block; animation: slideUp 0.25s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Banner & Alerts (Fixes Empty Space) */
+        .notice-banner {
+            background: linear-gradient(90deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+        .page-header h1 { font-size: 28px; font-weight: 800; color: var(--text-title); }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Metric Grid Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+        }
+        .metric-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-value { font-size: 30px; font-weight: 800; color: var(--text-title); margin-top: 6px; }
+
+        /* Active Ticket Hero Widget */
+        .live-ticket-hero {
+            background: linear-gradient(135deg, #1e40af, #2563eb);
+            color: #ffffff;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-lg);
+        }
+        .ticket-stepper { display: flex; justify-content: space-between; margin-top: 24px; position: relative; }
+        .step-node { flex: 1; text-align: center; }
+        .step-circle {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 800;
+            font-size: 14px;
+        }
+        .step-node.active .step-circle { background: #ffffff; color: var(--primary); }
+
+        /* Extra Fill Panels (Notice, Support, Timeline) */
+        .dashboard-layout-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+        }
+        .panel h3 { font-size: 17px; font-weight: 700; color: var(--text-title); margin-bottom: 14px; }
+
+        .guide-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .guide-step:last-child { border-bottom: none; }
+        .guide-num {
+            width: 26px;
+            height: 26px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        /* Menu Food Grid */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .food-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .food-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .food-badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+        .food-badge.veg { background: var(--success-light); color: var(--success); }
+        .food-badge.nonveg { background: #fee2e2; color: var(--danger); }
+        .btn-add {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add:hover { background: var(--primary); color: #ffffff; }
+
+        /* Cart Box */
+        .cart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 26px;
+            max-width: 560px;
+            box-shadow: var(--shadow-card);
+        }
+        .btn-action-primary {
+            width: 100%;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+            transition: 0.2s;
+        }
+        .btn-action-primary:hover { background: var(--primary-accent); }
+
+        /* In-App Toast Notification (Alert Box Replacement) */
+        #inAppToast {
+            visibility: hidden;
+            min-width: 290px;
+            background: #0f172a;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 14px 22px;
+            position: fixed;
+            z-index: 1000;
+            bottom: 30px;
+            right: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--primary-accent);
+        }
+        #inAppToast.active { visibility: visible; animation: popToast 0.3s, fadeToast 0.4s 2.6s; }
+        @keyframes popToast { from { bottom: 10px; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeToast { from { bottom: 30px; opacity: 1; } to { bottom: 10px; opacity: 0; } }
+
+        /* Mobile Viewport Handling */
+        @media (max-width: 850px) {
+            body { flex-direction: column; }
+            aside { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; }
+            .nav-menu { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+            .nav-link { white-space: nowrap; font-size: 12px; padding: 8px 12px; }
+            main { margin-left: 0; padding: 20px 16px; }
+            .dashboard-layout-row { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Sidebar -->
     <aside>
-        <div class="logo">&#9889; Forkline Smart</div>
-        <ul class="nav-list">
-            <li class="nav-item active" onclick="showTab(event, 'tab-overview')">&#128202; Dashboard Overview</li>
-            <li class="nav-item" onclick="showTab(event, 'tab-menu')">&#127828; Food Catalog</li>
-            <li class="nav-item" onclick="showTab(event, 'tab-cart')">&#128722; Tray & Checkout (<span id="cartCountBadge">0</span>)</li>
-            <li class="nav-item" onclick="showTab(event, 'tab-track')">&#128336; Live Tracking</li>
-            <li class="nav-item" onclick="showTab(event, 'tab-wallet')">&#128179; Campus Wallet</li>
+        <div class="brand-box">
+            <div class="brand-icon">&#9889;</div>
+            <div class="brand-title">Forkline Smart Canteen</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-link active" onclick="navigateTab(event, 'tab-dashboard')">&#128202; Dashboard</li>
+            <li class="nav-link" onclick="navigateTab(event, 'tab-catalog')">&#127828; Food Catalog</li>
+            <li class="nav-link" onclick="navigateTab(event, 'tab-tray')">&#128722; Cart / Tray <span class="nav-pill" id="trayCountBadge">0</span></li>
+            <li class="nav-link" onclick="navigateTab(event, 'tab-logs')">&#128336; My History</li>
+            <li class="nav-link" onclick="navigateTab(event, 'tab-card')">&#128179; Campus Card</li>
         </ul>
-        <div class="user-footer">
+
+        <div class="profile-card">
             <div>
-                <div style="font-weight:700; font-size:13px;">{{ user.fullname }}</div>
-                <div style="font-size:11px; color:var(--text-muted);">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
+                <div style="font-size:13px; font-weight:700; color:var(--text-title);">{{ user.fullname }}</div>
+                <div style="font-size:12px; color:var(--primary); font-weight:800;">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
             </div>
-            <a href="/logout" style="color:var(--danger); text-decoration:none; font-size:12px; font-weight:700;">Logout</a>
+            <a href="/logout" style="color:var(--danger); text-decoration:none; font-size:12px; font-weight:700;">Sign Out</a>
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main>
-        <!-- TAB 1: OVERVIEW -->
-        <div id="tab-overview" class="tab-pane active">
-            <h1 style="margin-bottom:6px;">Hello, {{ user.fullname }}</h1>
-            <p style="color:var(--text-muted); margin-bottom:28px;">Welcome to your automated student dining terminal</p>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:700;">ACTIVE TOKEN IDENTIFIER</span>
-                    <div class="stat-val" style="color:var(--primary);">{% if active_order %}{{ active_order.token_id }}{% else %}None{% endif %}</div>
-                </div>
-                <div class="stat-card">
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:700;">WALLET CREDIT</span>
-                    <div class="stat-val">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
-                </div>
-                <div class="stat-card">
-                    <span style="font-size:12px; color:var(--text-muted); font-weight:700;">TOTAL CAMPUS ORDERS</span>
-                    <div class="stat-val">{{ orders|length }}</div>
+        <!-- TAB 1: OVERVIEW DASHBOARD -->
+        <div id="tab-dashboard" class="tab-section active">
+            
+            <div class="notice-banner">
+                <span>📢 <strong>Recess Rush Alert:</strong> Lunch token counters are active. Place your pre-orders 10 minutes early.</span>
+                <span style="background:#ffffff; padding:4px 10px; border-radius:8px; font-size:11px;">Kitchen Live</span>
+            </div>
+
+            <div class="page-header">
+                <div>
+                    <h1>Welcome, {{ user.fullname }} 👋</h1>
+                    <p>Track your token status and explore today's campus counter menu.</p>
                 </div>
             </div>
 
+            <!-- Stats Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-label">Active Ticket</span>
+                    <div class="metric-value" style="color:var(--primary);">{% if active_order %}{{ active_order.token_id }}{% else %}None{% endif %}</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Campus Card Funds</span>
+                    <div class="metric-value" style="color:var(--success);">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Completed Orders</span>
+                    <div class="metric-value">{{ orders|length }}</div>
+                </div>
+            </div>
+
+            <!-- Active Ticket Hero Tracker -->
             {% if active_order %}
-            <div style="background:var(--bg-surface); border:1px solid var(--border); border-radius:14px; padding:24px;">
-                <h3>Active Pickup Ticket: {{ active_order.token_id }}</h3>
-                <p style="color:var(--text-muted); font-size:14px; margin-top:4px;">{{ active_order.items_summary }}</p>
-                <div class="stepper">
-                    <div class="step {% if active_order.status in ['Received','Preparing','Ready','Completed'] %}done{% endif %}">
-                        <div class="circle">1</div><span style="font-size:12px;">Order Placed</span>
+            <div class="live-ticket-hero">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <span style="background:rgba(255,255,255,0.25); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; letter-spacing:0.5px;">LIVE ACTIVE COUNTER TOKEN</span>
+                        <h2 style="font-size:32px; font-weight:900; margin-top:8px;">{{ active_order.token_id }}</h2>
+                        <p style="opacity:0.9; font-size:14px; margin-top:4px;">{{ active_order.items_summary }}</p>
                     </div>
-                    <div class="step {% if active_order.status in ['Preparing','Ready','Completed'] %}done{% endif %}">
-                        <div class="circle">2</div><span style="font-size:12px;">In Kitchen</span>
+                    <div style="text-align:right;">
+                        <span style="background:#ffffff; color:var(--primary); font-weight:800; padding:6px 14px; border-radius:10px; font-size:13px;">{{ active_order.status }}</span>
                     </div>
-                    <div class="step {% if active_order.status in ['Ready','Completed'] %}done{% endif %}">
-                        <div class="circle">3</div><span style="font-size:12px;">Ready for Pickup</span>
+                </div>
+
+                <div class="ticket-stepper">
+                    <div class="step-node {% if active_order.status in ['Received','Preparing','Ready','Completed'] %}active{% endif %}">
+                        <div class="step-circle">1</div>
+                        <span style="font-size:12px; font-weight:700;">Order Sent</span>
                     </div>
-                    <div class="step {% if active_order.status == 'Completed' %}done{% endif %}">
-                        <div class="circle">4</div><span style="font-size:12px;">Fulfillment</span>
+                    <div class="step-node {% if active_order.status in ['Preparing','Ready','Completed'] %}active{% endif %}">
+                        <div class="step-circle">2</div>
+                        <span style="font-size:12px; font-weight:700;">In Kitchen</span>
+                    </div>
+                    <div class="step-node {% if active_order.status in ['Ready','Completed'] %}active{% endif %}">
+                        <div class="step-circle">3</div>
+                        <span style="font-size:12px; font-weight:700;">Ready for Pickup</span>
+                    </div>
+                    <div class="step-node {% if active_order.status == 'Completed' %}active{% endif %}">
+                        <div class="step-circle">4</div>
+                        <span style="font-size:12px; font-weight:700;">Collected</span>
                     </div>
                 </div>
             </div>
             {% endif %}
+
+            <!-- Extra Panels (Fills Empty Space on Screen) -->
+            <div class="dashboard-layout-row">
+                <div class="panel">
+                    <h3>⚡ Zero-Queue Ordering Workflow</h3>
+                    <div class="guide-step">
+                        <div class="guide-num">1</div>
+                        <div>
+                            <strong style="color:var(--text-title); font-size:14px;">Select from Food Catalog</strong>
+                            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">Pick snacks, meal thalis, or drinks and add them to your dining tray.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">2</div>
+                        <div>
+                            <strong style="color:var(--text-title); font-size:14px;">Generate Collision-Free Token</strong>
+                            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">Confirm checkout using Campus Card funds. A unique sequence token is created.</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-num">3</div>
+                        <div>
+                            <strong style="color:var(--text-title); font-size:14px;">Show Token & Collect Meal</strong>
+                            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">When status turns "Ready for Pickup", visit the counter and collect directly without standing in billing queues.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="background:#eff6ff; border-color:#bfdbfe;">
+                    <h3 style="color:var(--primary);">🕒 Shift Schedule</h3>
+                    <div style="font-size:13px; color:var(--text-body); line-height:1.7;">
+                        <strong>Breakfast Shift:</strong> 8:30 AM – 11:00 AM<br>
+                        <strong>Lunch & Fast Food:</strong> 12:30 PM – 4:00 PM<br>
+                        <strong>Evening Tea:</strong> 4:30 PM – 6:30 PM
+                    </div>
+                    <div style="margin-top:16px; padding-top:12px; border-top:1px solid #dbeafe; font-size:12px; color:var(--text-muted);">
+                        Need help? Visit Canteen Counter 1 or reach out to staff.
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- TAB 2: MENU CATALOG -->
-        <div id="tab-menu" class="tab-pane">
-            <h2 style="margin-bottom:6px;">Digital Food Menu</h2>
-            <p style="color:var(--text-muted); margin-bottom:24px;">Instant campus pre-ordering with zero counter queue</p>
-            <div class="catalog-grid">
+        <!-- TAB 2: FOOD CATALOG -->
+        <div id="tab-catalog" class="tab-section">
+            <div class="page-header">
+                <div>
+                    <h1>Today's Kitchen Menu 🥪</h1>
+                    <p>Add fresh items to your tray with real-time stock verification.</p>
+                </div>
+            </div>
+
+            <div class="food-grid">
                 {% for item in menu %}
-                <div class="food-item {% if not item.in_stock %}out-stock{% endif %}">
-                    <span style="font-size:11px; font-weight:800; color:{% if item.is_veg %}var(--success){% else %}var(--danger){% endif %};">&#9679; {% if item.is_veg %}VEG{% else %}NON-VEG{% endif %}</span>
-                    <h3 style="font-size:16px; margin:8px 0 4px;">{{ item.name }}</h3>
-                    <div style="font-size:12px; color:var(--text-muted);">{{ item.category }}</div>
-                    <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:16px; font-weight:800; color:var(--primary);">&#8377;{{ "%.2f"|format(item.price) }}</span>
+                <div class="food-card">
+                    <span class="food-badge {% if item.is_veg %}veg{% else %}nonveg{% endif %}">
+                        {% if item.is_veg %}🌱 VEG{% else %}🍗 NON-VEG{% endif %}
+                    </span>
+                    <h3 style="font-size:16px; font-weight:700; color:var(--text-title); margin:10px 0 4px;">{{ item.name }}</h3>
+                    <p style="font-size:12px; color:var(--text-muted);">{{ item.category }}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px;">
+                        <span style="font-size:18px; font-weight:800; color:var(--text-title);">&#8377;{{ "%.2f"|format(item.price) }}</span>
                         {% if item.in_stock %}
-                        <button class="btn-add" onclick="pushToCart('{{ item.id }}', '{{ item.name }}', {{ item.price }})">+ Add</button>
+                        <button class="btn-add" onclick="pushToTray('{{ item.id }}', '{{ item.name }}', {{ item.price }})">+ Add</button>
                         {% else %}
-                        <span style="color:var(--danger); font-size:12px; font-weight:700;">Sold Out</span>
+                        <span style="color:var(--danger); font-size:12px; font-weight:800;">Sold Out</span>
                         {% endif %}
                     </div>
                 </div>
@@ -144,128 +487,167 @@
             </div>
         </div>
 
-        <!-- TAB 3: CART & CHECKOUT -->
-        <div id="tab-cart" class="tab-pane">
-            <div class="cart-box">
-                <h2>Your Dining Tray</h2>
-                <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Review your items before generating a digital token</p>
-                <div id="cartListing">
-                    <p style="color:var(--text-muted);">Your tray is currently empty.</p>
+        <!-- TAB 3: CART / TRAY -->
+        <div id="tab-tray" class="tab-section">
+            <div class="page-header">
+                <div>
+                    <h1>Your Dining Tray 🛒</h1>
+                    <p>Review and confirm your order before digital token issuance.</p>
                 </div>
-                <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:14px;">
-                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:700;">
-                        <span>Total Payable</span>
-                        <span id="cartGrandTotal" style="color:var(--primary);">&#8377;0.00</span>
+            </div>
+
+            <div class="cart-card">
+                <div id="trayListing">
+                    <p style="color:var(--text-muted); font-size:14px;">Your tray is currently empty.</p>
+                </div>
+
+                <div style="border-top:1px solid var(--border); padding-top:16px; margin-top:18px;">
+                    <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800;">
+                        <span style="color:var(--text-title);">Total Due:</span>
+                        <span id="trayGrandTotal" style="color:var(--primary);">&#8377;0.00</span>
                     </div>
                 </div>
-                <textarea id="orderNotes" placeholder="Special kitchen notes (e.g., extra chutney, no sugar)..." style="width:100%; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px; color:#fff; margin-top:14px; font-size:13px;"></textarea>
-                <button class="btn-confirm" onclick="executeCheckout()">Place Order (Campus Wallet) &rarr;</button>
+
+                <textarea id="instructions" placeholder="Optional instructions (e.g., extra tissue, no chutney)..." style="width:100%; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:16px; font-size:13px; outline:none; background:var(--surface-elevated);"></textarea>
+
+                <button class="btn-action-primary" onclick="confirmOrderCheckout()">Confirm Order (Campus Card) &rarr;</button>
             </div>
         </div>
 
-        <!-- TAB 4: LIVE TRACKING & HISTORY -->
-        <div id="tab-track" class="tab-pane">
-            <h2>Order History & Logs</h2>
-            <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+        <!-- TAB 4: ORDER HISTORY -->
+        <div id="tab-logs" class="tab-section">
+            <div class="page-header">
+                <div>
+                    <h1>My Past Orders & Receipts 📜</h1>
+                    <p>Complete historical ledger of fulfilled and active canteen meals.</p>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
                 {% for o in orders %}
-                <div style="background:var(--bg-surface); border:1px solid var(--border); border-radius:12px; padding:18px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="panel" style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <strong style="color:var(--primary); font-size:16px;">{{ o.token_id }}</strong>
-                        <div style="font-size:14px; margin-top:4px;">{{ o.items_summary }}</div>
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{ o.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+                        <strong style="color:var(--primary); font-size:18px;">{{ o.token_id }}</strong>
+                        <div style="font-size:14px; font-weight:600; color:var(--text-title); margin-top:4px;">{{ o.items_summary }}</div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{ o.created_at.strftime('%d %B %Y, %I:%M %p') }}</div>
                     </div>
                     <div style="text-align:right;">
-                        <span style="padding:4px 10px; border-radius:20px; font-size:12px; font-weight:700; background:var(--bg-card); color:var(--primary);">{{ o.status }}</span>
-                        <div style="font-weight:700; margin-top:6px;">&#8377;{{ "%.2f"|format(o.total_amount) }}</div>
+                        <span style="background:var(--primary-light); color:var(--primary); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700;">{{ o.status }}</span>
+                        <div style="font-size:16px; font-weight:800; color:var(--text-title); margin-top:6px;">&#8377;{{ "%.2f"|format(o.total_amount) }}</div>
                     </div>
                 </div>
                 {% else %}
-                <p style="color:var(--text-muted);">No order history available yet.</p>
+                <p style="color:var(--text-muted);">No orders found yet.</p>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- TAB 5: CAMPUS WALLET -->
-        <div id="tab-wallet" class="tab-pane">
-            <div class="cart-box">
-                <h2>Campus Dining Card</h2>
-                <div style="background:linear-gradient(135deg, #182230, #090d12); border:1px solid var(--border); border-radius:14px; padding:24px; margin:20px 0;">
-                    <div style="font-size:12px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">Student Digital Account</div>
-                    <div style="font-size:22px; font-weight:800; margin:8px 0;">{{ user.fullname }}</div>
-                    <div style="font-size:32px; font-weight:900; color:var(--primary);">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
+        <!-- TAB 5: CAMPUS CARD -->
+        <div id="tab-card" class="tab-section">
+            <div class="page-header">
+                <div>
+                    <h1>Campus Smart Card 💳</h1>
+                    <p>Digital cashless wallet balance for campus dining.</p>
                 </div>
+            </div>
+
+            <div class="panel" style="max-width:520px; background:linear-gradient(135deg, #1e40af, #1e3a8a); color:#ffffff;">
+                <span style="font-size:12px; opacity:0.85; letter-spacing:1px;">STUDENT DINING CARD</span>
+                <h3 style="font-size:24px; margin:10px 0 2px;">{{ user.fullname }}</h3>
+                <div style="font-size:36px; font-weight:900; margin-top:10px;">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
+            </div>
+
+            <div class="panel" style="max-width:520px; margin-top:20px;">
+                <h3>Add Instant Balance (Mock Gateway)</h3>
                 <form method="POST" action="/api/wallet/add-funds">
-                    <label style="font-size:12px; color:var(--text-muted); font-weight:700;">ADD INSTANT CREDIT (MOCK GATEWAY)</label>
-                    <select name="amount" style="width:100%; background:var(--bg-card); border:1px solid var(--border); color:#fff; padding:12px; border-radius:8px; margin:8px 0 16px;">
-                        <option value="100.00">&#8377;100.00</option>
-                        <option value="250.00">&#8377;250.00</option>
-                        <option value="500.00">&#8377;500.00</option>
+                    <label style="font-size:12px; font-weight:700; color:var(--text-muted);">CHOOSE RECHARGE AMOUNT</label>
+                    <select name="amount" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; margin:8px 0 16px; font-weight:600; outline:none; background:var(--surface-elevated);">
+                        <option value="100.00">&#8377;100.00 (Standard)</option>
+                        <option value="250.00">&#8377;250.00 (Snacks Pack)</option>
+                        <option value="500.00">&#8377;500.00 (Weekly Canteen Plan)</option>
                     </select>
-                    <button type="submit" class="btn-confirm" style="background:var(--success); color:#fff;">+ Top Up Wallet</button>
+                    <button type="submit" style="width:100%; background:var(--success); color:#ffffff; border:none; padding:13px; border-radius:10px; font-weight:700; cursor:pointer;">+ Recharge Campus Balance</button>
                 </form>
             </div>
         </div>
+
     </main>
 
-    <script>
-        let tray = [];
+    <!-- In-App Floating Toast Notification (Eliminates Browser Alert) -->
+    <div id="inAppToast">
+        <span style="font-size:18px;">✅</span>
+        <span id="toastContent">Message</span>
+    </div>
 
-        function showTab(e, tabId) {
-            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    <script>
+        let trayData = [];
+
+        function triggerNotification(text) {
+            const toast = document.getElementById("inAppToast");
+            document.getElementById("toastContent").innerText = text;
+            toast.className = "active";
+            setTimeout(() => { toast.className = toast.className.replace("active", ""); }, 3000);
+        }
+
+        function navigateTab(e, tabId) {
+            document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             e.currentTarget.classList.add('active');
         }
 
-        function pushToCart(id, name, price) {
-            const found = tray.find(i => i.id === id);
-            if(found) { found.qty += 1; }
-            else { tray.push({id, name, price, qty: 1}); }
+        function pushToTray(id, name, price) {
+            const item = trayData.find(x => x.id === id);
+            if(item) { item.qty += 1; }
+            else { trayData.push({ id, name, price, qty: 1 }); }
             renderTray();
-            alert(`${name} added to tray!`);
+            triggerNotification(`${name} added to tray!`);
         }
 
         function renderTray() {
-            const listing = document.getElementById("cartListing");
-            const grandTotal = document.getElementById("cartGrandTotal");
-            const badge = document.getElementById("cartCountBadge");
+            const container = document.getElementById("trayListing");
+            const totalEl = document.getElementById("trayGrandTotal");
+            const badge = document.getElementById("trayCountBadge");
 
             let total = 0;
             let count = 0;
 
-            if(tray.length === 0) {
-                listing.innerHTML = '<p style="color:var(--text-muted);">Your tray is currently empty.</p>';
+            if(trayData.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">Your tray is currently empty.</p>';
             } else {
-                listing.innerHTML = tray.map(i => {
-                    total += i.price * i.qty;
-                    count += i.qty;
-                    return `<div class="cart-line">
-                        <div><strong>${i.name}</strong> x ${i.qty}</div>
-                        <span style="color:var(--primary); font-weight:bold;">₹${(i.price * i.qty).toFixed(2)}</span>
+                container.innerHTML = trayData.map(item => {
+                    total += item.price * item.qty;
+                    count += item.qty;
+                    return `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f1f5f9; font-size:14px;">
+                        <span><strong>${item.name}</strong> × ${item.qty}</span>
+                        <strong style="color:var(--primary);">₹${(item.price * item.qty).toFixed(2)}</strong>
                     </div>`;
                 }).join("");
             }
-            grandTotal.innerText = `₹${total.toFixed(2)}`;
+            totalEl.innerText = `₹${total.toFixed(2)}`;
             badge.innerText = count;
         }
 
-        async function executeCheckout() {
-            if(tray.length === 0) return alert("Select items from the Food Catalog first!");
-            const total = tray.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            const notes = document.getElementById("orderNotes").value;
+        async function confirmOrderCheckout() {
+            if(trayData.length === 0) {
+                triggerNotification("Please select items from the menu first!");
+                return;
+            }
+            const total = trayData.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            const notes = document.getElementById("instructions").value;
 
             const res = await fetch("/api/order/place", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({items: tray, total, notes})
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ items: trayData, total, notes })
             });
             const data = await res.json();
+
             if(data.success) {
-                alert(`Order Confirmed! Your Digital Token is: ${data.token_id}`);
-                tray = [];
-                window.location.reload();
+                triggerNotification(`Order Confirmed! Your Token is ${data.token_id}`);
+                setTimeout(() => { window.location.reload(); }, 1200);
             } else {
-                alert(data.message);
+                triggerNotification(data.message || "Order failed!");
             }
         }
     </script>
