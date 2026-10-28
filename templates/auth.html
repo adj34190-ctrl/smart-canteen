@@ -181,4 +181,76 @@
           {% if messages %}
             <div class="flash-msg">{{ messages[0] }}</div>
           {% endif %}
-        
+        {% endwith %}
+
+        <div class="toggle-box">
+            <button class="toggle-btn active" type="button" onclick="switchTo('login')">Sign In</button>
+            <button class="toggle-btn" type="button" onclick="switchTo('register')">Create Account</button>
+        </div>
+
+        <form method="POST" action="/" autocomplete="off">
+            <input type="hidden" name="action" id="actionField" value="login">
+
+            <div class="input-group" id="fullnameGroup" style="display:none;">
+                <label>Full Name</label>
+                <input type="text" name="fullname" placeholder="Enter your full name">
+            </div>
+
+            <div class="input-group">
+                <label>College Email</label>
+                <input type="email" name="email" placeholder="Enter your email" required autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required autocomplete="new-password">
+            </div>
+
+            <div class="input-group">
+                <label>Access Role</label>
+                <select name="role">
+                    <option value="student">Student Portal</option>
+                    <option value="staff">Canteen Staff / Kitchen</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Enter Campus Portal &rarr;</button>
+        </form>
+
+        <div class="demo-credentials">
+            <strong>Ready Demo Access:</strong><br>
+            Student: <code>student@college.edu / pass123</code><br>
+            Kitchen Staff: <code>staff@college.edu / staff123</code>
+        </div>
+    </div>
+
+    <script>
+        function switchTo(type) {
+            const btns = document.querySelectorAll('.toggle-btn');
+            const action = document.getElementById('actionField');
+            const fullname = document.getElementById('fullnameGroup');
+            const heading = document.getElementById('formHeading');
+            const subtitle = document.getElementById('formSubtitle');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (type === 'login') {
+                btns[0].classList.add('active');
+                btns[1].classList.remove('active');
+                action.value = 'login';
+                fullname.style.display = 'none';
+                heading.innerText = 'Sign In';
+                subtitle.innerText = 'Enterprise Cafeteria Ordering Portal';
+                submitBtn.innerHTML = 'Enter Campus Portal &rarr;';
+            } else {
+                btns[1].classList.add('active');
+                btns[0].classList.remove('active');
+                action.value = 'register';
+                fullname.style.display = 'block';
+                heading.innerText = 'Register Account';
+                subtitle.innerText = 'Create your student dining credentials';
+                submitBtn.innerHTML = 'Create Account &rarr;';
+            }
+        }
+    </script>
+</body>
+</html>
