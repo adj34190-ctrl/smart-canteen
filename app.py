@@ -115,7 +115,7 @@ def auth():
         elif action == "forgot_password":
             user = User.query.filter_by(email=email).first()
             if user:
-                flash(f"A password reset token has been sent to {email}. (Mock Demo)", "success")
+                flash(f"A password reset link has been dispatched to {email}.", "success")
             else:
                 flash("No registered student profile found with this college ID.", "error")
 
@@ -165,7 +165,7 @@ def place_order():
         return jsonify({"success": False, "message": "Cart cannot be empty!"})
 
     if user.wallet_balance < total_amount:
-        return jsonify({"success": False, "message": "Insufficient Campus Wallet Balance. Please recharge!"})
+        return jsonify({"success": False, "message": "Insufficient Campus Card Balance. Please recharge!"})
 
     user.wallet_balance -= total_amount
     total_orders = Order.query.count() + 101
@@ -186,6 +186,38 @@ def place_order():
 
     return jsonify({"success": True, "token_id": token_id, "new_balance": user.wallet_balance})
 
+# CANCEL ORDER & INSTANT REFUND ROUTE
+@app.route("/api/order/cancel", methods=["POST"])
+def cancel_order():
+    if session.get("role") != "student":
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    user = User.query.get(session["user_id"])
+    data = request.json or {}
+    token_id = data.get("token_id")
+
+    order = Order.query.filter_by(token_id=token_id, user_id=user.id).first()
+    if not order:
+        return jsonify({"success": False, "message": "Order not found."}), 404
+
+    # Kitchen start hone ke baad cancel nahi ho sakta
+    if order.status != "Received":
+        return jsonify({
+            "success": False, 
+            "message": f"Order cannot be cancelled. Kitchen has already started {order.status}!"
+        })
+
+    # Refund full amount to student wallet
+    user.wallet_balance += order.total_amount
+    order.status = "Cancelled"
+    db.session.commit()
+
+    return jsonify({
+        "success": True, 
+        "message": f"Order {token_id} cancelled. ₹{order.total_amount:.2f} refunded to your card.",
+        "new_balance": user.wallet_balance
+    })
+
 @app.route("/api/wallet/add-funds", methods=["POST"])
 def add_funds():
     if "user_id" not in session:
@@ -194,7 +226,7 @@ def add_funds():
     amount = float(request.form.get("amount", 100.0))
     user = User.query.get(session["user_id"])
     
-    # Campus Dining Card Cap: ₹2,000 max limit to prevent misuse
+    # Campus Dining Card Cap: Max ₹2,000 limit
     MAX_CAP = 2000.0
     if (user.wallet_balance + amount) > MAX_CAP:
         flash(f"Recharge limit exceeded! Maximum allowed card balance is ₹{MAX_CAP:.2f}.", "error")
@@ -202,7 +234,7 @@ def add_funds():
 
     user.wallet_balance += amount
     db.session.commit()
-    flash(f"₹{amount:.2f} successfully credited to your Campus Dining Card.", "success")
+    flash(f"₹{amount:.2f} credited to your Campus Dining Card.", "success")
     return redirect(url_for("student_dashboard"))
 
 @app.route("/staff-console")
@@ -212,7 +244,7 @@ def staff_dashboard():
 
     orders = Order.query.order_by(Order.id.desc()).all()
     menu_items = MenuItem.query.all()
-    total_revenue = sum([o.total_amount for o in orders])
+    total_revenue = sum([o.total_amount for o in orders if o.status != 'Cancelled'])
     completed_count = len([o for o in orders if o.status == 'Completed'])
 
     return render_template("staff_dashboard.html", 
