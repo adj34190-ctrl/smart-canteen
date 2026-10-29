@@ -213,6 +213,7 @@
         }
         .panel h3 { font-size: 17px; font-weight: 700; color: var(--text-title); margin-bottom: 14px; }
 
+        /* Food Cards & Quantity Controls */
         .food-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -225,11 +226,15 @@
             padding: 20px;
             box-shadow: var(--shadow-card);
             transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .food-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-        .food-badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+        .food-badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; width: fit-content; }
         .food-badge.veg { background: var(--success-light); color: var(--success); }
         .food-badge.nonveg { background: #fee2e2; color: var(--danger); }
+        
         .btn-add {
             background: var(--primary-light);
             color: var(--primary);
@@ -243,12 +248,45 @@
         }
         .btn-add:hover { background: var(--primary); color: #ffffff; }
 
+        /* Interactive Quantity Controller */
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary-light);
+            border-radius: 10px;
+            padding: 2px 6px;
+            gap: 8px;
+        }
+        .qty-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+        }
+        .qty-btn:hover { background: var(--primary-accent); }
+        .qty-number {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary);
+            min-width: 18px;
+            text-align: center;
+        }
+
         .cart-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 18px;
             padding: 26px;
-            max-width: 560px;
+            max-width: 580px;
             box-shadow: var(--shadow-card);
         }
         .btn-action-primary {
@@ -319,7 +357,7 @@
         <div class="profile-card">
             <div>
                 <div style="font-size:13px; font-weight:700; color:var(--text-title);">{{ user.fullname }}</div>
-                <div style="font-size:12px; color:var(--primary); font-weight:800;" id="userCardBal">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
+                <div style="font-size:12px; color:var(--primary); font-weight:800;">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
             </div>
             <a href="/logout" style="color:var(--danger); text-decoration:none; font-size:12px; font-weight:700;">Sign Out</a>
         </div>
@@ -356,7 +394,6 @@
                 </div>
             </div>
 
-            <!-- Active Order Hero with Cancel Button -->
             {% if active_order %}
             <div class="live-ticket-hero">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -381,7 +418,7 @@
                 <div class="panel">
                     <h3>⚡ Zero-Queue Ordering Workflow</h3>
                     <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
-                        1. Add items to tray from <strong>Food Catalog</strong>.<br>
+                        1. Add items and choose quantity from <strong>Food Catalog</strong>.<br>
                         2. Checkout with <strong>Campus Smart Card</strong>.<br>
                         3. Track status in <strong>Live Tracking</strong> tab.<br>
                         4. Collect food directly when token is <em>Ready</em>!
@@ -399,7 +436,7 @@
             </div>
         </div>
 
-        <!-- TAB 2: LIVE TRACKING (WITH CANCEL OPTION & REAL-TIME POLLING) -->
+        <!-- TAB 2: LIVE TRACKING -->
         <div id="tab-tracking" class="tab-section">
             <div class="page-header">
                 <div>
@@ -419,7 +456,6 @@
                     <div style="text-align:right;">
                         <span id="liveStatusBadge" style="background:#ffffff; color:var(--primary); font-weight:800; padding:8px 16px; border-radius:12px; font-size:14px;">{{ active_order.status }}</span>
                         
-                        <!-- Cancel Button (Only visible while status is Received) -->
                         <div id="trackingCancelBtnBox" style="margin-top:12px; {% if active_order.status != 'Received' %}display:none;{% endif %}">
                             <button class="btn-cancel-order" onclick="requestCancelOrder('{{ active_order.token_id }}')">✕ Cancel Order & Refund</button>
                         </div>
@@ -440,297 +476,4 @@
                         <span style="font-size:12px; font-weight:700;">Ready for Pickup</span>
                     </div>
                     <div class="step-node {% if active_order.status == 'Completed' %}active{% endif %}" id="step4">
-                        <div class="step-circle">4</div>
-                        <span style="font-size:12px; font-weight:700;">Collected</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel" style="max-width:650px;">
-                <h3 style="font-size:16px;">Kitchen Update Feed</h3>
-                <p style="font-size:13px; color:var(--text-muted); line-height:1.6;" id="liveStatusMessage">
-                    {% if active_order.status == 'Received' %}
-                        Your order ticket is registered. Kitchen staff will accept it shortly. (Cancellation is available).
-                    {% elif active_order.status == 'Preparing' %}
-                        Chef is preparing your meal in the kitchen!
-                    {% elif active_order.status == 'Ready' %}
-                        🎉 Your food is ready! Please proceed to Canteen Counter and show this token.
-                    {% else %}
-                        This meal has been fulfilled and collected.
-                    {% endif %}
-                </p>
-            </div>
-            {% else %}
-            <div class="panel" style="text-align:center; padding:50px 20px;">
-                <div style="font-size:40px; margin-bottom:12px;">🥪</div>
-                <h3 style="font-size:20px; color:var(--text-title);">No Active Orders</h3>
-                <p style="font-size:14px; color:var(--text-muted); margin-top:6px;">Place an order from the Food Catalog to start live tracking.</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- TAB 3: FOOD CATALOG -->
-        <div id="tab-catalog" class="tab-section">
-            <div class="page-header">
-                <div>
-                    <h1>Today's Kitchen Menu 🥪</h1>
-                    <p>Add fresh items to your tray with real-time stock verification.</p>
-                </div>
-            </div>
-
-            <div class="food-grid">
-                {% for item in menu %}
-                <div class="food-card">
-                    <span class="food-badge {% if item.is_veg %}veg{% else %}nonveg{% endif %}">
-                        {% if item.is_veg %}🌱 VEG{% else %}🍗 NON-VEG{% endif %}
-                    </span>
-                    <h3 style="font-size:16px; font-weight:700; color:var(--text-title); margin:10px 0 4px;">{{ item.name }}</h3>
-                    <p style="font-size:12px; color:var(--text-muted);">{{ item.category }}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px;">
-                        <span style="font-size:18px; font-weight:800; color:var(--text-title);">&#8377;{{ "%.2f"|format(item.price) }}</span>
-                        {% if item.in_stock %}
-                        <button class="btn-add" onclick="pushToTray('{{ item.id }}', '{{ item.name }}', {{ item.price }})">+ Add</button>
-                        {% else %}
-                        <span style="color:var(--danger); font-size:12px; font-weight:800;">Sold Out</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- TAB 4: CART / TRAY -->
-        <div id="tab-tray" class="tab-section">
-            <div class="page-header">
-                <div>
-                    <h1>Your Dining Tray 🛒</h1>
-                    <p>Review and confirm your order before digital token issuance.</p>
-                </div>
-            </div>
-
-            <div class="cart-card">
-                <div id="trayListing">
-                    <p style="color:var(--text-muted); font-size:14px;">Your tray is currently empty.</p>
-                </div>
-
-                <div style="border-top:1px solid var(--border); padding-top:16px; margin-top:18px;">
-                    <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800;">
-                        <span style="color:var(--text-title);">Total Due:</span>
-                        <span id="trayGrandTotal" style="color:var(--primary);">&#8377;0.00</span>
-                    </div>
-                </div>
-
-                <textarea id="instructions" placeholder="Optional instructions (e.g., extra tissue, no chutney)..." style="width:100%; border:1px solid var(--border); border-radius:10px; padding:12px; margin-top:16px; font-size:13px; outline:none; background:var(--surface-elevated);"></textarea>
-
-                <button class="btn-action-primary" onclick="confirmOrderCheckout()">Confirm Order (Campus Card) &rarr;</button>
-            </div>
-        </div>
-
-        <!-- TAB 5: ORDER HISTORY -->
-        <div id="tab-logs" class="tab-section">
-            <div class="page-header">
-                <div>
-                    <h1>My Past Orders & Receipts 📜</h1>
-                    <p>Complete historical ledger of fulfilled and active canteen meals.</p>
-                </div>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                {% for o in orders %}
-                <div class="panel" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong style="color:var(--primary); font-size:18px;">{{ o.token_id }}</strong>
-                        <div style="font-size:14px; font-weight:600; color:var(--text-title); margin-top:4px;">{{ o.items_summary }}</div>
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">{{ o.created_at.strftime('%d %B %Y, %I:%M %p') }}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="background:var(--primary-light); color:var(--primary); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700;">{{ o.status }}</span>
-                        <div style="font-size:16px; font-weight:800; color:var(--text-title); margin-top:6px;">&#8377;{{ "%.2f"|format(o.total_amount) }}</div>
-                    </div>
-                </div>
-                {% else %}
-                <p style="color:var(--text-muted);">No orders found yet.</p>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- TAB 6: CAMPUS CARD (CAPPED WALLET) -->
-        <div id="tab-card" class="tab-section">
-            <div class="page-header">
-                <div>
-                    <h1>Campus Smart Card 💳</h1>
-                    <p>Digital cashless wallet balance for campus dining (Max Balance: ₹2,000).</p>
-                </div>
-            </div>
-
-            <div class="panel" style="max-width:520px; background:linear-gradient(135deg, #1e40af, #1e3a8a); color:#ffffff;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:12px; opacity:0.85; letter-spacing:1px;">STUDENT DINING CARD</span>
-                    <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">Max Cap: ₹2,000</span>
-                </div>
-                <h3 style="font-size:24px; margin:14px 0 2px;">{{ user.fullname }}</h3>
-                <div style="font-size:36px; font-weight:900; margin-top:10px;">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
-            </div>
-
-            <div class="panel" style="max-width:520px; margin-top:20px;">
-                <h3>Add Card Funds</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Select an authorized refill pack. Cards cannot exceed ₹2,000 balance.</p>
-                <form method="POST" action="/api/wallet/add-funds">
-                    <label style="font-size:12px; font-weight:700; color:var(--text-muted);">CHOOSE RECHARGE AMOUNT</label>
-                    <select name="amount" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; margin:8px 0 16px; font-weight:600; outline:none; background:var(--surface-elevated);">
-                        <option value="100.00">&#8377;100.00 (Standard)</option>
-                        <option value="250.00">&#8377;250.00 (Snacks Pack)</option>
-                        <option value="500.00">&#8377;500.00 (Weekly Canteen Plan - Max)</option>
-                    </select>
-                    <button type="submit" style="width:100%; background:var(--success); color:#ffffff; border:none; padding:13px; border-radius:10px; font-weight:700; cursor:pointer;">+ Recharge Campus Balance</button>
-                </form>
-            </div>
-        </div>
-
-    </main>
-
-    <div id="inAppToast">
-        <span style="font-size:18px;">✅</span>
-        <span id="toastContent">Message</span>
-    </div>
-
-    <script>
-        let trayData = [];
-
-        function triggerNotification(text) {
-            const toast = document.getElementById("inAppToast");
-            document.getElementById("toastContent").innerText = text;
-            toast.className = "active";
-            setTimeout(() => { toast.className = toast.className.replace("active", ""); }, 3000);
-        }
-
-        function navigateTab(e, tabId) {
-            document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            e.currentTarget.classList.add('active');
-        }
-
-        function pushToTray(id, name, price) {
-            const item = trayData.find(x => x.id === id);
-            if(item) { item.qty += 1; }
-            else { trayData.push({ id, name, price, qty: 1 }); }
-            renderTray();
-            triggerNotification(`${name} added to tray!`);
-        }
-
-        function renderTray() {
-            const container = document.getElementById("trayListing");
-            const totalEl = document.getElementById("trayGrandTotal");
-            const badge = document.getElementById("trayCountBadge");
-
-            let total = 0;
-            let count = 0;
-
-            if(trayData.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">Your tray is currently empty.</p>';
-            } else {
-                container.innerHTML = trayData.map(item => {
-                    total += item.price * item.qty;
-                    count += item.qty;
-                    return `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f1f5f9; font-size:14px;">
-                        <span><strong>${item.name}</strong> × ${item.qty}</span>
-                        <strong style="color:var(--primary);">₹${(item.price * item.qty).toFixed(2)}</strong>
-                    </div>`;
-                }).join("");
-            }
-            totalEl.innerText = `₹${total.toFixed(2)}`;
-            badge.innerText = count;
-        }
-
-        async function confirmOrderCheckout() {
-            if(trayData.length === 0) {
-                triggerNotification("Please select items from the menu first!");
-                return;
-            }
-            const total = trayData.reduce((acc, i) => acc + (i.price * i.qty), 0);
-            const notes = document.getElementById("instructions").value;
-
-            const res = await fetch("/api/order/place", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ items: trayData, total, notes })
-            });
-            const data = await res.json();
-
-            if(data.success) {
-                triggerNotification(`Order Confirmed! Your Token is ${data.token_id}`);
-                setTimeout(() => { window.location.reload(); }, 1200);
-            } else {
-                triggerNotification(data.message || "Order failed!");
-            }
-        }
-
-        // CANCEL ORDER FUNCTION
-        async function requestCancelOrder(tokenId) {
-            if(!confirm(`Are you sure you want to cancel order ${tokenId}? Full amount will be refunded to your Campus Card.`)) {
-                return;
-            }
-
-            const res = await fetch("/api/order/cancel", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token_id: tokenId })
-            });
-            const data = await res.json();
-
-            if(data.success) {
-                triggerNotification(data.message);
-                setTimeout(() => { window.location.reload(); }, 1400);
-            } else {
-                triggerNotification(data.message);
-            }
-        }
-
-        // Live Order Status Polling (Auto-check every 4 seconds)
-        const trackBox = document.getElementById("trackingContainer");
-        if(trackBox) {
-            const activeToken = trackBox.getAttribute("data-token");
-            setInterval(async () => {
-                try {
-                    const response = await fetch(`/api/order/status/${activeToken}`);
-                    const data = await response.json();
-                    if(data.success) {
-                        const badge = document.getElementById("liveStatusBadge");
-                        const msg = document.getElementById("liveStatusMessage");
-                        const cancelBox = document.getElementById("trackingCancelBtnBox");
-
-                        if(badge && badge.innerText !== data.status) {
-                            badge.innerText = data.status;
-                            triggerNotification(`Order ${activeToken} status updated: ${data.status}`);
-                            
-                            const s2 = document.getElementById("step2");
-                            const s3 = document.getElementById("step3");
-                            const s4 = document.getElementById("step4");
-
-                            if(data.status === 'Preparing') {
-                                s2.classList.add('active');
-                                msg.innerText = "Chef is preparing your meal in the kitchen!";
-                                if(cancelBox) cancelBox.style.display = "none";
-                            } else if(data.status === 'Ready') {
-                                s2.classList.add('active');
-                                s3.classList.add('active');
-                                msg.innerText = "🎉 Your food is ready! Please proceed to Canteen Counter and show this token.";
-                                if(cancelBox) cancelBox.style.display = "none";
-                            } else if(data.status === 'Completed') {
-                                s2.classList.add('active');
-                                s3.classList.add('active');
-                                s4.classList.add('active');
-                                msg.innerText = "This meal has been fulfilled and collected.";
-                                if(cancelBox) cancelBox.style.display = "none";
-                            }
-                        }
-                    }
-                } catch(e) {
-                    console.log("Telemetry poll skip");
-                }
-            }, 4000);
-        }
-    </script>
-</body>
-</html>
+                        <
