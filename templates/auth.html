@@ -126,6 +126,21 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
+        .forgot-link-box {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -8px;
+            margin-bottom: 18px;
+        }
+        .forgot-link {
+            color: var(--primary-accent);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -138,31 +153,40 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
             transition: 0.2s;
-            margin-top: 8px;
         }
         .btn-submit:hover {
             background: var(--primary-accent);
         }
 
-        .demo-credentials {
-            margin-top: 24px;
-            padding: 14px 16px;
-            background: var(--primary-light);
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            font-size: 12px;
-            color: var(--primary);
-            line-height: 1.6;
-        }
-
         .flash-msg {
-            padding: 10px 14px;
-            border-radius: 8px;
+            padding: 12px 14px;
+            border-radius: 10px;
             margin-bottom: 18px;
             font-size: 13px;
             font-weight: 600;
-            background: #fee2e2;
-            color: var(--danger);
+        }
+        .flash-msg.error { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+        .flash-msg.success { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
+
+        /* Forgot Password Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -177,9 +201,11 @@
         <h1 id="formHeading">Sign In</h1>
         <p class="subtitle" id="formSubtitle">Enterprise Cafeteria Ordering Portal</p>
 
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            <div class="flash-msg">{{ messages[0] }}</div>
+            {% for category, message in messages %}
+              <div class="flash-msg {{ category }}">{{ message }}</div>
+            {% endfor %}
           {% endif %}
         {% endwith %}
 
@@ -198,12 +224,16 @@
 
             <div class="input-group">
                 <label>College Email</label>
-                <input type="email" name="email" placeholder="Enter your email" required autocomplete="off">
+                <input type="email" name="email" placeholder="Enter your college email" required autocomplete="off">
             </div>
 
             <div class="input-group">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="Enter your password" required autocomplete="new-password">
+            </div>
+
+            <div class="forgot-link-box" id="forgotBox">
+                <span class="forgot-link" onclick="toggleModal(true)">Forgot Password?</span>
             </div>
 
             <div class="input-group">
@@ -216,11 +246,23 @@
 
             <button type="submit" class="btn-submit" id="submitBtn">Enter Campus Portal &rarr;</button>
         </form>
+    </div>
 
-        <div class="demo-credentials">
-            <strong>Ready Demo Access:</strong><br>
-            Student: <code>student@college.edu / pass123</code><br>
-            Kitchen Staff: <code>staff@college.edu / staff123</code>
+    <!-- Forgot Password Modal Popup -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-card">
+            <h2 style="font-size:20px; font-weight:800; color:var(--text-dark);">Reset Dining Account</h2>
+            <p style="font-size:13px; color:var(--text-muted); margin:6px 0 20px;">Enter your enrolled college email to receive instant recovery credentials.</p>
+            
+            <form method="POST" action="/">
+                <input type="hidden" name="action" value="forgot_password">
+                <div class="input-group">
+                    <label>Registered College Email</label>
+                    <input type="email" name="email" placeholder="student@college.edu" required>
+                </div>
+                <button type="submit" class="btn-submit" style="margin-top:6px;">Send Recovery Instructions</button>
+                <button type="button" onclick="toggleModal(false)" style="width:100%; background:transparent; border:none; color:var(--text-muted); font-size:13px; font-weight:700; margin-top:12px; cursor:pointer;">Cancel</button>
+            </form>
         </div>
     </div>
 
@@ -232,12 +274,14 @@
             const heading = document.getElementById('formHeading');
             const subtitle = document.getElementById('formSubtitle');
             const submitBtn = document.getElementById('submitBtn');
+            const forgotBox = document.getElementById('forgotBox');
 
             if (type === 'login') {
                 btns[0].classList.add('active');
                 btns[1].classList.remove('active');
                 action.value = 'login';
                 fullname.style.display = 'none';
+                forgotBox.style.display = 'flex';
                 heading.innerText = 'Sign In';
                 subtitle.innerText = 'Enterprise Cafeteria Ordering Portal';
                 submitBtn.innerHTML = 'Enter Campus Portal &rarr;';
@@ -246,10 +290,15 @@
                 btns[0].classList.remove('active');
                 action.value = 'register';
                 fullname.style.display = 'block';
+                forgotBox.style.display = 'none';
                 heading.innerText = 'Register Account';
                 subtitle.innerText = 'Create your student dining credentials';
                 submitBtn.innerHTML = 'Create Account &rarr;';
             }
+        }
+
+        function toggleModal(show) {
+            document.getElementById('resetModal').style.display = show ? 'flex' : 'none';
         }
     </script>
 </body>
