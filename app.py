@@ -42,15 +42,12 @@ def setup_database():
     try:
         db.create_all()
 
-        # Seed initial demo users
         if not User.query.filter_by(email='student@college.edu').first():
             db.session.add(User(fullname='Student Adarsh', email='student@college.edu', password='pass123', role='student', wallet_balance=750.0))
             db.session.add(User(fullname='Canteen Master', email='staff@college.edu', password='staff123', role='staff', wallet_balance=0.0))
             db.session.commit()
 
-        # Complete Updated Menu Items List
         master_menu = [
-            # Original Essentials
             {'name': 'Samosa Pav (2 Pcs)', 'category': 'Snacks', 'price': 25.0, 'is_veg': True},
             {'name': 'Mumbai Special Vada Pav', 'category': 'Snacks', 'price': 20.0, 'is_veg': True},
             {'name': 'Crispy Butter Masala Dosa', 'category': 'South Indian', 'price': 65.0, 'is_veg': True},
@@ -65,7 +62,6 @@ def setup_database():
             {'name': 'Fresh Ginger Masala Chai', 'category': 'Beverages', 'price': 15.0, 'is_veg': True}
         ]
 
-        # Sync items without wiping existing orders
         for item_data in master_menu:
             existing = MenuItem.query.filter_by(name=item_data['name']).first()
             if not existing:
@@ -89,9 +85,9 @@ def auth():
     if request.method == "POST":
         action = request.form.get("action")
         email = request.form.get("email")
-        password = request.form.get("password")
 
         if action == "login":
+            password = request.form.get("password")
             role = request.form.get("role")
             user = User.query.filter_by(email=email, password=password, role=role).first()
             if user:
@@ -104,16 +100,24 @@ def auth():
             flash("Invalid credentials or role selected.", "error")
 
         elif action == "register":
+            password = request.form.get("password")
             fullname = request.form.get("fullname")
             role = request.form.get("role", "student")
             existing = User.query.filter_by(email=email).first()
             if existing:
                 flash("College email already registered.", "error")
             else:
-                new_u = User(fullname=fullname, email=email, password=password, role=role, wallet_balance=500.0)
+                new_u = User(fullname=fullname, email=email, password=password, role=role, wallet_balance=350.0)
                 db.session.add(new_u)
                 db.session.commit()
                 flash("Registration complete! You can now log in.", "success")
+
+        elif action == "forgot_password":
+            user = User.query.filter_by(email=email).first()
+            if user:
+                flash(f"A password reset token has been sent to {email}. (Mock Demo)", "success")
+            else:
+                flash("No registered student profile found with this college ID.", "error")
 
     return render_template("auth.html")
 
@@ -131,6 +135,20 @@ def student_dashboard():
     ).order_by(Order.id.desc()).first()
 
     return render_template("student_dashboard.html", user=user, menu=menu_items, orders=user_orders, active_order=active_order)
+
+@app.route("/api/order/status/<token_id>")
+def get_order_status(token_id):
+    if "user_id" not in session:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    order = Order.query.filter_by(token_id=token_id).first()
+    if not order:
+        return jsonify({"success": False, "message": "Not found"}), 404
+    return jsonify({
+        "success": True, 
+        "token_id": order.token_id, 
+        "status": order.status, 
+        "items": order.items_summary
+    })
 
 @app.route("/api/order/place", methods=["POST"])
 def place_order():
@@ -172,10 +190,19 @@ def place_order():
 def add_funds():
     if "user_id" not in session:
         return redirect(url_for("auth"))
-    amount = float(request.form.get("amount", 200.0))
+    
+    amount = float(request.form.get("amount", 100.0))
     user = User.query.get(session["user_id"])
+    
+    # Campus Dining Card Cap: ₹2,000 max limit to prevent misuse
+    MAX_CAP = 2000.0
+    if (user.wallet_balance + amount) > MAX_CAP:
+        flash(f"Recharge limit exceeded! Maximum allowed card balance is ₹{MAX_CAP:.2f}.", "error")
+        return redirect(url_for("student_dashboard"))
+
     user.wallet_balance += amount
     db.session.commit()
+    flash(f"₹{amount:.2f} successfully credited to your Campus Dining Card.", "success")
     return redirect(url_for("student_dashboard"))
 
 @app.route("/staff-console")
