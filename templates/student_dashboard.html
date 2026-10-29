@@ -185,6 +185,19 @@
         }
         .step-node.active .step-circle { background: #ffffff; color: var(--primary); }
 
+        .btn-cancel-order {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-cancel-order:hover { background: var(--danger); }
+
         .dashboard-layout-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -306,7 +319,7 @@
         <div class="profile-card">
             <div>
                 <div style="font-size:13px; font-weight:700; color:var(--text-title);">{{ user.fullname }}</div>
-                <div style="font-size:12px; color:var(--primary); font-weight:800;">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
+                <div style="font-size:12px; color:var(--primary); font-weight:800;" id="userCardBal">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
             </div>
             <a href="/logout" style="color:var(--danger); text-decoration:none; font-size:12px; font-weight:700;">Sign Out</a>
         </div>
@@ -317,7 +330,7 @@
         <!-- TAB 1: OVERVIEW DASHBOARD -->
         <div id="tab-dashboard" class="tab-section active">
             <div class="notice-banner">
-                <span>📢 <strong>Recess Rush Alert:</strong> Smart kitchen tokens are active. Avoid long queues by ordering in advance.</span>
+                <span>📢 <strong>Recess Rush Alert:</strong> Smart kitchen tokens are active. Avoid queues by ordering early.</span>
                 <span style="background:#ffffff; padding:4px 10px; border-radius:8px; font-size:11px;">Kitchen Live</span>
             </div>
 
@@ -331,7 +344,7 @@
             <div class="metrics-grid">
                 <div class="metric-card">
                     <span class="metric-label">Active Ticket</span>
-                    <div class="metric-value" style="color:var(--primary);" id="dashActiveToken">{% if active_order %}{{ active_order.token_id }}{% else %}None{% endif %}</div>
+                    <div class="metric-value" style="color:var(--primary);">{% if active_order %}{{ active_order.token_id }}{% else %}None{% endif %}</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Campus Card Funds</span>
@@ -343,14 +356,35 @@
                 </div>
             </div>
 
+            <!-- Active Order Hero with Cancel Button -->
+            {% if active_order %}
+            <div class="live-ticket-hero">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <span style="background:rgba(255,255,255,0.25); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800;">ACTIVE COUNTER TOKEN</span>
+                        <h2 style="font-size:32px; font-weight:900; margin-top:8px;">{{ active_order.token_id }}</h2>
+                        <p style="opacity:0.95; font-size:14px; margin-top:4px;">{{ active_order.items_summary }}</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="background:#ffffff; color:var(--primary); font-weight:800; padding:6px 14px; border-radius:10px; font-size:13px;">{{ active_order.status }}</span>
+                        {% if active_order.status == 'Received' %}
+                        <div style="margin-top:10px;">
+                            <button class="btn-cancel-order" onclick="requestCancelOrder('{{ active_order.token_id }}')">✕ Cancel Order</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="dashboard-layout-row">
                 <div class="panel">
                     <h3>⚡ Zero-Queue Ordering Workflow</h3>
                     <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
-                        1. Add items to cart from the <strong>Food Catalog</strong>.<br>
-                        2. Checkout instantly with your <strong>Campus Smart Card</strong>.<br>
-                        3. Monitor your token on the <strong>Live Tracking</strong> tab.<br>
-                        4. When status is <em>Ready for Pickup</em>, show your token at the counter!
+                        1. Add items to tray from <strong>Food Catalog</strong>.<br>
+                        2. Checkout with <strong>Campus Smart Card</strong>.<br>
+                        3. Track status in <strong>Live Tracking</strong> tab.<br>
+                        4. Collect food directly when token is <em>Ready</em>!
                     </p>
                 </div>
 
@@ -365,12 +399,12 @@
             </div>
         </div>
 
-        <!-- TAB 2: DEDICATED LIVE TRACKING (REAL-TIME AUTO POLL) -->
+        <!-- TAB 2: LIVE TRACKING (WITH CANCEL OPTION & REAL-TIME POLLING) -->
         <div id="tab-tracking" class="tab-section">
             <div class="page-header">
                 <div>
                     <h1>Live Counter Tracking ⏱️</h1>
-                    <p>Real-time telemetry of your order status from kitchen preparation to counter dispatch.</p>
+                    <p>Real-time telemetry of your order status from kitchen to counter dispatch.</p>
                 </div>
             </div>
 
@@ -383,7 +417,12 @@
                         <p style="opacity:0.95; font-size:14px; margin-top:4px;">{{ active_order.items_summary }}</p>
                     </div>
                     <div style="text-align:right;">
-                        <span id="liveStatusBadge" style="background:#ffffff; color:var(--primary); font-weight:800; padding:8px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">{{ active_order.status }}</span>
+                        <span id="liveStatusBadge" style="background:#ffffff; color:var(--primary); font-weight:800; padding:8px 16px; border-radius:12px; font-size:14px;">{{ active_order.status }}</span>
+                        
+                        <!-- Cancel Button (Only visible while status is Received) -->
+                        <div id="trackingCancelBtnBox" style="margin-top:12px; {% if active_order.status != 'Received' %}display:none;{% endif %}">
+                            <button class="btn-cancel-order" onclick="requestCancelOrder('{{ active_order.token_id }}')">✕ Cancel Order & Refund</button>
+                        </div>
                     </div>
                 </div>
 
@@ -411,7 +450,7 @@
                 <h3 style="font-size:16px;">Kitchen Update Feed</h3>
                 <p style="font-size:13px; color:var(--text-muted); line-height:1.6;" id="liveStatusMessage">
                     {% if active_order.status == 'Received' %}
-                        Your order ticket is registered. Kitchen staff will accept it shortly.
+                        Your order ticket is registered. Kitchen staff will accept it shortly. (Cancellation is available).
                     {% elif active_order.status == 'Preparing' %}
                         Chef is preparing your meal in the kitchen!
                     {% elif active_order.status == 'Ready' %}
@@ -424,7 +463,7 @@
             {% else %}
             <div class="panel" style="text-align:center; padding:50px 20px;">
                 <div style="font-size:40px; margin-bottom:12px;">🥪</div>
-                <h3 style="font-size:20px; color:var(--text-title);">No Active Orders Being Prepared</h3>
+                <h3 style="font-size:20px; color:var(--text-title);">No Active Orders</h3>
                 <p style="font-size:14px; color:var(--text-muted); margin-top:6px;">Place an order from the Food Catalog to start live tracking.</p>
             </div>
             {% endif %}
@@ -510,12 +549,12 @@
                     </div>
                 </div>
                 {% else %}
-                <p style="color:var(--text-muted);">No past orders found.</p>
+                <p style="color:var(--text-muted);">No orders found yet.</p>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- TAB 6: CAMPUS CARD (CAPPED WALLET WITH RESTRICTIONS) -->
+        <!-- TAB 6: CAMPUS CARD (CAPPED WALLET) -->
         <div id="tab-card" class="tab-section">
             <div class="page-header">
                 <div>
@@ -527,7 +566,7 @@
             <div class="panel" style="max-width:520px; background:linear-gradient(135deg, #1e40af, #1e3a8a); color:#ffffff;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:12px; opacity:0.85; letter-spacing:1px;">STUDENT DINING CARD</span>
-                    <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">Policy Cap: ₹2,000</span>
+                    <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">Max Cap: ₹2,000</span>
                 </div>
                 <h3 style="font-size:24px; margin:14px 0 2px;">{{ user.fullname }}</h3>
                 <div style="font-size:36px; font-weight:900; margin-top:10px;">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
@@ -535,7 +574,7 @@
 
             <div class="panel" style="max-width:520px; margin-top:20px;">
                 <h3>Add Card Funds</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Select an authorized refill pack. Cards cannot exceed ₹2,000 in balance to comply with campus policies.</p>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Select an authorized refill pack. Cards cannot exceed ₹2,000 balance.</p>
                 <form method="POST" action="/api/wallet/add-funds">
                     <label style="font-size:12px; font-weight:700; color:var(--text-muted);">CHOOSE RECHARGE AMOUNT</label>
                     <select name="amount" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; margin:8px 0 16px; font-weight:600; outline:none; background:var(--surface-elevated);">
@@ -627,6 +666,27 @@
             }
         }
 
+        // CANCEL ORDER FUNCTION
+        async function requestCancelOrder(tokenId) {
+            if(!confirm(`Are you sure you want to cancel order ${tokenId}? Full amount will be refunded to your Campus Card.`)) {
+                return;
+            }
+
+            const res = await fetch("/api/order/cancel", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token_id: tokenId })
+            });
+            const data = await res.json();
+
+            if(data.success) {
+                triggerNotification(data.message);
+                setTimeout(() => { window.location.reload(); }, 1400);
+            } else {
+                triggerNotification(data.message);
+            }
+        }
+
         // Live Order Status Polling (Auto-check every 4 seconds)
         const trackBox = document.getElementById("trackingContainer");
         if(trackBox) {
@@ -638,11 +698,12 @@
                     if(data.success) {
                         const badge = document.getElementById("liveStatusBadge");
                         const msg = document.getElementById("liveStatusMessage");
+                        const cancelBox = document.getElementById("trackingCancelBtnBox");
+
                         if(badge && badge.innerText !== data.status) {
                             badge.innerText = data.status;
-                            triggerNotification(`Order ${activeToken} status updated to: ${data.status}`);
+                            triggerNotification(`Order ${activeToken} status updated: ${data.status}`);
                             
-                            // Update stepper nodes
                             const s2 = document.getElementById("step2");
                             const s3 = document.getElementById("step3");
                             const s4 = document.getElementById("step4");
@@ -650,15 +711,18 @@
                             if(data.status === 'Preparing') {
                                 s2.classList.add('active');
                                 msg.innerText = "Chef is preparing your meal in the kitchen!";
+                                if(cancelBox) cancelBox.style.display = "none";
                             } else if(data.status === 'Ready') {
                                 s2.classList.add('active');
                                 s3.classList.add('active');
                                 msg.innerText = "🎉 Your food is ready! Please proceed to Canteen Counter and show this token.";
+                                if(cancelBox) cancelBox.style.display = "none";
                             } else if(data.status === 'Completed') {
                                 s2.classList.add('active');
                                 s3.classList.add('active');
                                 s4.classList.add('active');
                                 msg.innerText = "This meal has been fulfilled and collected.";
+                                if(cancelBox) cancelBox.style.display = "none";
                             }
                         }
                     }
