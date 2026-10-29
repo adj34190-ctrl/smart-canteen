@@ -6,23 +6,22 @@
     <title>Smart Canteen | Student Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ---------------- MODERN LIGHT BLUE & WHITE COLOR PALETTE ---------------- */
         :root {
-            --bg-main: #f1f5f9;         /* Soft Cool Gray/Ice Blue Canvas */
-            --surface: #ffffff;         /* Pure Clean White */
-            --surface-elevated: #f8fafc;/* Soft Slate Card Background */
-            --primary: #1e40af;         /* Deep Executive Blue */
-            --primary-accent: #2563eb;  /* Vibrant Royal Blue */
-            --primary-light: #dbeafe;   /* Light Sky Tint */
-            --text-title: #0f172a;      /* Deep Midnight Navy */
-            --text-body: #334155;       /* Slate Dark Gray */
-            --text-muted: #64748b;      /* Muted Steel Gray */
-            --border: #e2e8f0;          /* Crisp Border Line */
-            --success: #059669;         /* Mint Green */
-            --success-light: #d1fae5;   /* Light Mint Background */
-            --warning: #d97706;         /* Amber */
-            --warning-light: #fef3c7;   /* Amber Light */
-            --danger: #dc2626;          /* Red */
+            --bg-main: #f1f5f9;
+            --surface: #ffffff;
+            --surface-elevated: #f8fafc;
+            --primary: #1e40af;
+            --primary-accent: #2563eb;
+            --primary-light: #dbeafe;
+            --text-title: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #dc2626;
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 10px 15px -3px rgba(37, 99, 235, 0.08);
         }
@@ -30,7 +29,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg-main); color: var(--text-body); display: flex; min-height: 100vh; }
 
-        /* Left Navigation Sidebar */
         aside {
             width: 280px;
             background: var(--surface);
@@ -51,7 +49,7 @@
             padding: 10px 14px;
             background: var(--primary-light);
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 26px;
         }
         .brand-icon {
             width: 36px;
@@ -113,7 +111,6 @@
             justify-content: space-between;
         }
 
-        /* Main Workspace Container */
         main {
             margin-left: 280px;
             flex: 1;
@@ -125,7 +122,6 @@
         .tab-section.active { display: block; animation: slideUp 0.25s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Banner & Alerts (Fixes Empty Space) */
         .notice-banner {
             background: linear-gradient(90deg, #eff6ff, #dbeafe);
             border: 1px solid #bfdbfe;
@@ -149,7 +145,6 @@
         .page-header h1 { font-size: 28px; font-weight: 800; color: var(--text-title); }
         .page-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
 
-        /* Metric Grid Cards */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -162,12 +157,10 @@
             border-radius: 16px;
             padding: 22px;
             box-shadow: var(--shadow-card);
-            position: relative;
         }
         .metric-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .metric-value { font-size: 30px; font-weight: 800; color: var(--text-title); margin-top: 6px; }
 
-        /* Active Ticket Hero Widget */
         .live-ticket-hero {
             background: linear-gradient(135deg, #1e40af, #2563eb);
             color: #ffffff;
@@ -176,7 +169,7 @@
             margin-bottom: 28px;
             box-shadow: var(--shadow-lg);
         }
-        .ticket-stepper { display: flex; justify-content: space-between; margin-top: 24px; position: relative; }
+        .ticket-stepper { display: flex; justify-content: space-between; margin-top: 24px; }
         .step-node { flex: 1; text-align: center; }
         .step-circle {
             width: 38px;
@@ -192,7 +185,6 @@
         }
         .step-node.active .step-circle { background: #ffffff; color: var(--primary); }
 
-        /* Extra Fill Panels (Notice, Support, Timeline) */
         .dashboard-layout-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -208,29 +200,6 @@
         }
         .panel h3 { font-size: 17px; font-weight: 700; color: var(--text-title); margin-bottom: 14px; }
 
-        .guide-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .guide-step:last-child { border-bottom: none; }
-        .guide-num {
-            width: 26px;
-            height: 26px;
-            background: var(--primary-light);
-            color: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        /* Menu Food Grid */
         .food-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -242,7 +211,7 @@
             border-radius: 18px;
             padding: 20px;
             box-shadow: var(--shadow-card);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: 0.2s;
         }
         .food-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
         .food-badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
@@ -261,7 +230,6 @@
         }
         .btn-add:hover { background: var(--primary); color: #ffffff; }
 
-        /* Cart Box */
         .cart-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -282,11 +250,9 @@
             cursor: pointer;
             margin-top: 20px;
             box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
-            transition: 0.2s;
         }
         .btn-action-primary:hover { background: var(--primary-accent); }
 
-        /* In-App Toast Notification (Alert Box Replacement) */
         #inAppToast {
             visibility: hidden;
             min-width: 290px;
@@ -310,7 +276,6 @@
         @keyframes popToast { from { bottom: 10px; opacity: 0; } to { bottom: 30px; opacity: 1; } }
         @keyframes fadeToast { from { bottom: 30px; opacity: 1; } to { bottom: 10px; opacity: 0; } }
 
-        /* Mobile Viewport Handling */
         @media (max-width: 850px) {
             body { flex-direction: column; }
             aside { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; }
@@ -323,7 +288,6 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
     <aside>
         <div class="brand-box">
             <div class="brand-icon">&#9889;</div>
@@ -332,6 +296,7 @@
 
         <ul class="nav-menu">
             <li class="nav-link active" onclick="navigateTab(event, 'tab-dashboard')">&#128202; Dashboard</li>
+            <li class="nav-link" onclick="navigateTab(event, 'tab-tracking')">&#9889; Live Tracking</li>
             <li class="nav-link" onclick="navigateTab(event, 'tab-catalog')">&#127828; Food Catalog</li>
             <li class="nav-link" onclick="navigateTab(event, 'tab-tray')">&#128722; Cart / Tray <span class="nav-pill" id="trayCountBadge">0</span></li>
             <li class="nav-link" onclick="navigateTab(event, 'tab-logs')">&#128336; My History</li>
@@ -347,14 +312,12 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main>
 
         <!-- TAB 1: OVERVIEW DASHBOARD -->
         <div id="tab-dashboard" class="tab-section active">
-            
             <div class="notice-banner">
-                <span>📢 <strong>Recess Rush Alert:</strong> Lunch token counters are active. Place your pre-orders 10 minutes early.</span>
+                <span>📢 <strong>Recess Rush Alert:</strong> Smart kitchen tokens are active. Avoid long queues by ordering in advance.</span>
                 <span style="background:#ffffff; padding:4px 10px; border-radius:8px; font-size:11px;">Kitchen Live</span>
             </div>
 
@@ -365,11 +328,10 @@
                 </div>
             </div>
 
-            <!-- Stats Metrics -->
             <div class="metrics-grid">
                 <div class="metric-card">
                     <span class="metric-label">Active Ticket</span>
-                    <div class="metric-value" style="color:var(--primary);">{% if active_order %}{{ active_order.token_id }}{% else %}None{% endif %}</div>
+                    <div class="metric-value" style="color:var(--primary);" id="dashActiveToken">{% if active_order %}{{ active_order.token_id }}{% else %}None{% endif %}</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Campus Card Funds</span>
@@ -381,66 +343,15 @@
                 </div>
             </div>
 
-            <!-- Active Ticket Hero Tracker -->
-            {% if active_order %}
-            <div class="live-ticket-hero">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <span style="background:rgba(255,255,255,0.25); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; letter-spacing:0.5px;">LIVE ACTIVE COUNTER TOKEN</span>
-                        <h2 style="font-size:32px; font-weight:900; margin-top:8px;">{{ active_order.token_id }}</h2>
-                        <p style="opacity:0.9; font-size:14px; margin-top:4px;">{{ active_order.items_summary }}</p>
-                    </div>
-                    <div style="text-align:right;">
-                        <span style="background:#ffffff; color:var(--primary); font-weight:800; padding:6px 14px; border-radius:10px; font-size:13px;">{{ active_order.status }}</span>
-                    </div>
-                </div>
-
-                <div class="ticket-stepper">
-                    <div class="step-node {% if active_order.status in ['Received','Preparing','Ready','Completed'] %}active{% endif %}">
-                        <div class="step-circle">1</div>
-                        <span style="font-size:12px; font-weight:700;">Order Sent</span>
-                    </div>
-                    <div class="step-node {% if active_order.status in ['Preparing','Ready','Completed'] %}active{% endif %}">
-                        <div class="step-circle">2</div>
-                        <span style="font-size:12px; font-weight:700;">In Kitchen</span>
-                    </div>
-                    <div class="step-node {% if active_order.status in ['Ready','Completed'] %}active{% endif %}">
-                        <div class="step-circle">3</div>
-                        <span style="font-size:12px; font-weight:700;">Ready for Pickup</span>
-                    </div>
-                    <div class="step-node {% if active_order.status == 'Completed' %}active{% endif %}">
-                        <div class="step-circle">4</div>
-                        <span style="font-size:12px; font-weight:700;">Collected</span>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Extra Panels (Fills Empty Space on Screen) -->
             <div class="dashboard-layout-row">
                 <div class="panel">
                     <h3>⚡ Zero-Queue Ordering Workflow</h3>
-                    <div class="guide-step">
-                        <div class="guide-num">1</div>
-                        <div>
-                            <strong style="color:var(--text-title); font-size:14px;">Select from Food Catalog</strong>
-                            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">Pick snacks, meal thalis, or drinks and add them to your dining tray.</p>
-                        </div>
-                    </div>
-                    <div class="guide-step">
-                        <div class="guide-num">2</div>
-                        <div>
-                            <strong style="color:var(--text-title); font-size:14px;">Generate Collision-Free Token</strong>
-                            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">Confirm checkout using Campus Card funds. A unique sequence token is created.</p>
-                        </div>
-                    </div>
-                    <div class="guide-step">
-                        <div class="guide-num">3</div>
-                        <div>
-                            <strong style="color:var(--text-title); font-size:14px;">Show Token & Collect Meal</strong>
-                            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">When status turns "Ready for Pickup", visit the counter and collect directly without standing in billing queues.</p>
-                        </div>
-                    </div>
+                    <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+                        1. Add items to cart from the <strong>Food Catalog</strong>.<br>
+                        2. Checkout instantly with your <strong>Campus Smart Card</strong>.<br>
+                        3. Monitor your token on the <strong>Live Tracking</strong> tab.<br>
+                        4. When status is <em>Ready for Pickup</em>, show your token at the counter!
+                    </p>
                 </div>
 
                 <div class="panel" style="background:#eff6ff; border-color:#bfdbfe;">
@@ -450,14 +361,76 @@
                         <strong>Lunch & Fast Food:</strong> 12:30 PM – 4:00 PM<br>
                         <strong>Evening Tea:</strong> 4:30 PM – 6:30 PM
                     </div>
-                    <div style="margin-top:16px; padding-top:12px; border-top:1px solid #dbeafe; font-size:12px; color:var(--text-muted);">
-                        Need help? Visit Canteen Counter 1 or reach out to staff.
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: FOOD CATALOG -->
+        <!-- TAB 2: DEDICATED LIVE TRACKING (REAL-TIME AUTO POLL) -->
+        <div id="tab-tracking" class="tab-section">
+            <div class="page-header">
+                <div>
+                    <h1>Live Counter Tracking ⏱️</h1>
+                    <p>Real-time telemetry of your order status from kitchen preparation to counter dispatch.</p>
+                </div>
+            </div>
+
+            {% if active_order %}
+            <div class="live-ticket-hero" id="trackingContainer" data-token="{{ active_order.token_id }}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <span style="background:rgba(255,255,255,0.25); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800;">REAL-TIME QUEUE DISPATCH</span>
+                        <h2 style="font-size:36px; font-weight:900; margin-top:8px;">{{ active_order.token_id }}</h2>
+                        <p style="opacity:0.95; font-size:14px; margin-top:4px;">{{ active_order.items_summary }}</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <span id="liveStatusBadge" style="background:#ffffff; color:var(--primary); font-weight:800; padding:8px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">{{ active_order.status }}</span>
+                    </div>
+                </div>
+
+                <div class="ticket-stepper">
+                    <div class="step-node {% if active_order.status in ['Received','Preparing','Ready','Completed'] %}active{% endif %}" id="step1">
+                        <div class="step-circle">1</div>
+                        <span style="font-size:12px; font-weight:700;">Order Sent</span>
+                    </div>
+                    <div class="step-node {% if active_order.status in ['Preparing','Ready','Completed'] %}active{% endif %}" id="step2">
+                        <div class="step-circle">2</div>
+                        <span style="font-size:12px; font-weight:700;">In Kitchen</span>
+                    </div>
+                    <div class="step-node {% if active_order.status in ['Ready','Completed'] %}active{% endif %}" id="step3">
+                        <div class="step-circle">3</div>
+                        <span style="font-size:12px; font-weight:700;">Ready for Pickup</span>
+                    </div>
+                    <div class="step-node {% if active_order.status == 'Completed' %}active{% endif %}" id="step4">
+                        <div class="step-circle">4</div>
+                        <span style="font-size:12px; font-weight:700;">Collected</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="max-width:650px;">
+                <h3 style="font-size:16px;">Kitchen Update Feed</h3>
+                <p style="font-size:13px; color:var(--text-muted); line-height:1.6;" id="liveStatusMessage">
+                    {% if active_order.status == 'Received' %}
+                        Your order ticket is registered. Kitchen staff will accept it shortly.
+                    {% elif active_order.status == 'Preparing' %}
+                        Chef is preparing your meal in the kitchen!
+                    {% elif active_order.status == 'Ready' %}
+                        🎉 Your food is ready! Please proceed to Canteen Counter and show this token.
+                    {% else %}
+                        This meal has been fulfilled and collected.
+                    {% endif %}
+                </p>
+            </div>
+            {% else %}
+            <div class="panel" style="text-align:center; padding:50px 20px;">
+                <div style="font-size:40px; margin-bottom:12px;">🥪</div>
+                <h3 style="font-size:20px; color:var(--text-title);">No Active Orders Being Prepared</h3>
+                <p style="font-size:14px; color:var(--text-muted); margin-top:6px;">Place an order from the Food Catalog to start live tracking.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB 3: FOOD CATALOG -->
         <div id="tab-catalog" class="tab-section">
             <div class="page-header">
                 <div>
@@ -487,7 +460,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: CART / TRAY -->
+        <!-- TAB 4: CART / TRAY -->
         <div id="tab-tray" class="tab-section">
             <div class="page-header">
                 <div>
@@ -514,7 +487,7 @@
             </div>
         </div>
 
-        <!-- TAB 4: ORDER HISTORY -->
+        <!-- TAB 5: ORDER HISTORY -->
         <div id="tab-logs" class="tab-section">
             <div class="page-header">
                 <div>
@@ -537,34 +510,38 @@
                     </div>
                 </div>
                 {% else %}
-                <p style="color:var(--text-muted);">No orders found yet.</p>
+                <p style="color:var(--text-muted);">No past orders found.</p>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- TAB 5: CAMPUS CARD -->
+        <!-- TAB 6: CAMPUS CARD (CAPPED WALLET WITH RESTRICTIONS) -->
         <div id="tab-card" class="tab-section">
             <div class="page-header">
                 <div>
                     <h1>Campus Smart Card 💳</h1>
-                    <p>Digital cashless wallet balance for campus dining.</p>
+                    <p>Digital cashless wallet balance for campus dining (Max Balance: ₹2,000).</p>
                 </div>
             </div>
 
             <div class="panel" style="max-width:520px; background:linear-gradient(135deg, #1e40af, #1e3a8a); color:#ffffff;">
-                <span style="font-size:12px; opacity:0.85; letter-spacing:1px;">STUDENT DINING CARD</span>
-                <h3 style="font-size:24px; margin:10px 0 2px;">{{ user.fullname }}</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:12px; opacity:0.85; letter-spacing:1px;">STUDENT DINING CARD</span>
+                    <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">Policy Cap: ₹2,000</span>
+                </div>
+                <h3 style="font-size:24px; margin:14px 0 2px;">{{ user.fullname }}</h3>
                 <div style="font-size:36px; font-weight:900; margin-top:10px;">&#8377;{{ "%.2f"|format(user.wallet_balance) }}</div>
             </div>
 
             <div class="panel" style="max-width:520px; margin-top:20px;">
-                <h3>Add Instant Balance (Mock Gateway)</h3>
+                <h3>Add Card Funds</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Select an authorized refill pack. Cards cannot exceed ₹2,000 in balance to comply with campus policies.</p>
                 <form method="POST" action="/api/wallet/add-funds">
                     <label style="font-size:12px; font-weight:700; color:var(--text-muted);">CHOOSE RECHARGE AMOUNT</label>
                     <select name="amount" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:10px; margin:8px 0 16px; font-weight:600; outline:none; background:var(--surface-elevated);">
                         <option value="100.00">&#8377;100.00 (Standard)</option>
                         <option value="250.00">&#8377;250.00 (Snacks Pack)</option>
-                        <option value="500.00">&#8377;500.00 (Weekly Canteen Plan)</option>
+                        <option value="500.00">&#8377;500.00 (Weekly Canteen Plan - Max)</option>
                     </select>
                     <button type="submit" style="width:100%; background:var(--success); color:#ffffff; border:none; padding:13px; border-radius:10px; font-weight:700; cursor:pointer;">+ Recharge Campus Balance</button>
                 </form>
@@ -573,7 +550,6 @@
 
     </main>
 
-    <!-- In-App Floating Toast Notification (Eliminates Browser Alert) -->
     <div id="inAppToast">
         <span style="font-size:18px;">✅</span>
         <span id="toastContent">Message</span>
@@ -649,6 +625,47 @@
             } else {
                 triggerNotification(data.message || "Order failed!");
             }
+        }
+
+        // Live Order Status Polling (Auto-check every 4 seconds)
+        const trackBox = document.getElementById("trackingContainer");
+        if(trackBox) {
+            const activeToken = trackBox.getAttribute("data-token");
+            setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/order/status/${activeToken}`);
+                    const data = await response.json();
+                    if(data.success) {
+                        const badge = document.getElementById("liveStatusBadge");
+                        const msg = document.getElementById("liveStatusMessage");
+                        if(badge && badge.innerText !== data.status) {
+                            badge.innerText = data.status;
+                            triggerNotification(`Order ${activeToken} status updated to: ${data.status}`);
+                            
+                            // Update stepper nodes
+                            const s2 = document.getElementById("step2");
+                            const s3 = document.getElementById("step3");
+                            const s4 = document.getElementById("step4");
+
+                            if(data.status === 'Preparing') {
+                                s2.classList.add('active');
+                                msg.innerText = "Chef is preparing your meal in the kitchen!";
+                            } else if(data.status === 'Ready') {
+                                s2.classList.add('active');
+                                s3.classList.add('active');
+                                msg.innerText = "🎉 Your food is ready! Please proceed to Canteen Counter and show this token.";
+                            } else if(data.status === 'Completed') {
+                                s2.classList.add('active');
+                                s3.classList.add('active');
+                                s4.classList.add('active');
+                                msg.innerText = "This meal has been fulfilled and collected.";
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.log("Telemetry poll skip");
+                }
+            }, 4000);
         }
     </script>
 </body>
